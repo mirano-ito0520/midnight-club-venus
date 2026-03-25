@@ -1,0 +1,42 @@
+/* ============================================
+   Name Entry Scene
+   ============================================ */
+
+#scene-name-entry {
+  justify-content: flex-end;
+}
+
+.name-entry-character {
+  position: absolute;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  animation: slide-up 1s ease-out;
+}
+
+.name-entry-character img {
+  height: 55vh;
+  max-height: 500px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(180, 74, 255, 0.3));
+}
+
+.name-entry-dialogue {
+  z-index: 10;
+}
+
+.name-input-container {
+  position: absolute;
+  bottom: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+  animation: slide-up 0.5s ease-out;
+}
+
+.name-input-container .name-input {
+  width: 200px;
+}

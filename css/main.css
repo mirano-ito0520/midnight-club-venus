@@ -1,0 +1,383 @@
+/* ============================================
+   Midnight Club Venus — Main Stylesheet
+   Theme: Dark Neon Club / Lounge
+   ============================================ */
+
+:root {
+  /* Core palette */
+  --bg-primary: #0a0a14;
+  --bg-secondary: #12101e;
+  --bg-card: rgba(20, 16, 38, 0.85);
+
+  /* Neon accents */
+  --neon-pink: #ff2d9b;
+  --neon-purple: #b44aff;
+  --neon-cyan: #00e5ff;
+  --neon-gold: #ffd700;
+
+  /* Text */
+  --text-primary: #f0e6ff;
+  --text-secondary: #a89cc8;
+  --text-muted: #6b5f8a;
+
+  /* Glow effects */
+  --glow-pink: 0 0 10px rgba(255, 45, 155, 0.5), 0 0 30px rgba(255, 45, 155, 0.2);
+  --glow-purple: 0 0 10px rgba(180, 74, 255, 0.5), 0 0 30px rgba(180, 74, 255, 0.2);
+  --glow-gold: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.2);
+
+  /* Sizing */
+  --max-width: 480px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.4s ease;
+  --transition-slow: 0.8s ease;
+}
+
+/* ---- Reset & Base ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Scene System ---- */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-slow), visibility var(--transition-slow);
+  z-index: 0;
+}
+
+.scene.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+.scene.fade-out {
+  opacity: 0;
+  visibility: visible;
+  z-index: 1;
+}
+
+/* ---- Background layers ---- */
+.name-entry-bg,
+.lobby-bg,
+.jigsaw-bg,
+.gallery-bg,
+.dialogue-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.name-entry-bg::after,
+.lobby-bg::after,
+.jigsaw-bg::after,
+.gallery-bg::after,
+.dialogue-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 20, 0.3) 0%,
+    rgba(10, 10, 20, 0.1) 40%,
+    rgba(10, 10, 20, 0.6) 100%
+  );
+}
+
+/* ---- Loading Screen ---- */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  z-index: 1;
+}
+
+.loading-logo {
+  width: 80%;
+  max-width: 320px;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.loading-bar {
+  width: 200px;
+  height: 3px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.loading-text {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 4px;
+}
+
+/* ---- Neon Buttons ---- */
+.neon-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  padding: 12px 32px;
+  border: 1px solid var(--neon-pink);
+  background: transparent;
+  color: var(--neon-pink);
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 10;
+}
+
+.neon-btn:hover,
+.neon-btn:active {
+  background: rgba(255, 45, 155, 0.15);
+  box-shadow: var(--glow-pink);
+}
+
+.neon-btn-sm {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  padding: 6px 16px;
+  border: 1px solid var(--neon-purple);
+  background: transparent;
+  color: var(--neon-purple);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 10;
+}
+
+.neon-btn-sm:hover,
+.neon-btn-sm:active {
+  background: rgba(180, 74, 255, 0.15);
+  box-shadow: var(--glow-purple);
+}
+
+/* ---- Dialogue Box (shared) ---- */
+.dialogue-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 24px 32px;
+  background: linear-gradient(to top, rgba(10, 10, 20, 0.95), rgba(10, 10, 20, 0.7));
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  cursor: pointer;
+  min-height: 160px;
+}
+
+.dialogue-speaker {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--neon-gold);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+  text-shadow: var(--glow-gold);
+}
+
+.dialogue-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  min-height: 48px;
+}
+
+.dialogue-advance-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 20px;
+  font-size: 11px;
+  color: var(--text-muted);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+/* ---- Scene Title ---- */
+.scene-title {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  color: var(--neon-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 3px;
+  text-align: center;
+  margin-top: 24px;
+  z-index: 2;
+}
+
+/* ---- Back Button ---- */
+.back-btn {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* ---- Modal ---- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--neon-purple);
+  border-radius: 12px;
+  padding: 32px 24px;
+  width: 90%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-content h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--neon-gold);
+  text-align: center;
+  letter-spacing: 3px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-row label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  min-width: 80px;
+}
+
+.setting-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--neon-purple);
+}
+
+.setting-row.danger {
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.danger-btn {
+  border-color: #ff4444 !important;
+  color: #ff4444 !important;
+}
+
+.danger-btn:hover {
+  background: rgba(255, 68, 68, 0.15) !important;
+}
+
+/* ---- Input ---- */
+.name-input {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--neon-purple);
+  border-radius: 4px;
+  background: rgba(20, 16, 38, 0.9);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.name-input:focus {
+  border-color: var(--neon-pink);
+  box-shadow: var(--glow-pink);
+}
+
+/* ---- Animations ---- */
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 45, 155, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(255, 45, 155, 0.6)); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(180deg); opacity: 0; }
+}
+
+/* ---- Responsive ---- */
+@media (min-width: 481px) {
+  #app {
+    border-left: 1px solid rgba(180, 74, 255, 0.1);
+    border-right: 1px solid rgba(180, 74, 255, 0.1);
+  }
+}
+
+@media (max-height: 600px) {
+  .dialogue-box {
+    min-height: 120px;
+    padding: 12px 16px 24px;
+  }
+
+  .dialogue-text {
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,119 @@
+/* ============================================
+   Lobby Scene
+   ============================================ */
+
+#scene-lobby {
+  justify-content: flex-start;
+}
+
+.lobby-header {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  padding: 16px 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lobby-logo {
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 45, 155, 0.4));
+}
+
+.lobby-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.lobby-venus {
+  position: absolute;
+  bottom: 0;
+  right: -10px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lobby-venus img {
+  height: 70vh;
+  max-height: 600px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(180, 74, 255, 0.2));
+}
+
+.lobby-venus-speech {
+  position: relative;
+  z-index: 5;
+  margin: 16px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  width: calc(100% - 32px);
+  backdrop-filter: blur(4px);
+}
+
+.lobby-venus-speech::before {
+  content: 'VENUS';
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--neon-gold);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.lobby-cabinets {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0 16px 24px;
+  width: 100%;
+}
+
+.cabinet-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(180, 74, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cabinet-card:hover,
+.cabinet-card:active {
+  border-color: var(--neon-pink);
+  box-shadow: var(--glow-pink);
+  transform: translateY(-2px);
+}
+
+.cabinet-card.locked {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.cabinet-card img {
+  width: 80%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cabinet-card .cabinet-name {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: var(--neon-gold);
+  letter-spacing: 1px;
+}

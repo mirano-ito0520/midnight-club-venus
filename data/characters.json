@@ -1,0 +1,69 @@
+{
+  "venus": {
+    "id": "venus",
+    "name": "VENUS",
+    "nameJp": "ヴィーナス",
+    "role": "gamemaster",
+    "images": {
+      "portrait": "assets/images/characters/venus/portrait.png",
+      "fullbody": "assets/images/characters/venus/fullbody.png"
+    }
+  },
+  "marina": {
+    "id": "marina",
+    "name": "MARINA",
+    "nameJp": "マリーナ",
+    "role": "playable",
+    "background": "dialogue-beach",
+    "images": {
+      "portrait": "assets/images/characters/marina/portrait.png",
+      "easy": "assets/images/characters/marina/easy.png",
+      "normal": "assets/images/characters/marina/normal.png",
+      "hard": "assets/images/characters/marina/hard.png",
+      "expert": "assets/images/characters/marina/expert.png",
+      "master": "assets/images/characters/marina/master.png"
+    }
+  },
+  "luna": {
+    "id": "luna",
+    "name": "LUNA",
+    "nameJp": "ルナ",
+    "role": "playable",
+    "background": "dialogue-nightpool",
+    "images": {
+      "portrait": "assets/images/characters/luna/portrait.png",
+      "easy": "assets/images/characters/luna/easy.png",
+      "normal": "assets/images/characters/luna/normal.png",
+      "hard": "assets/images/characters/luna/hard.png",
+      "expert": "assets/images/characters/luna/expert.png",
+      "master": "assets/images/characters/luna/master.png"
+    }
+  },
+  "coral": {
+    "id": "coral",
+    "name": "CORAL",
+    "nameJp": "コーラル",
+    "role": "playable",
+    "background": "dialogue-tropical",
+    "images": {
+      "portrait": "assets/images/characters/coral/portrait.png",
+      "easy": "assets/images/characters/coral/easy.png",
+      "normal": "assets/images/characters/coral/normal.png",
+      "hard": "assets/images/characters/coral/hard.png",
+      "expert": "assets/images/characters/coral/expert.png",
+      "master": "assets/images/characters/coral/master.png"
+    }
+  },
+  "difficulties": [
+    { "id": "easy",   "name": "Easy",   "stars": "★☆☆☆☆", "pieces": 9,  "cols": 3 },
+    { "id": "normal", "name": "Normal", "stars": "★★☆☆☆", "pieces": 16, "cols": 4 },
+    { "id": "hard",   "name": "Hard",   "stars": "★★★☆☆", "pieces": 25, "cols": 5 },
+    { "id": "expert", "name": "Expert", "stars": "★★★★☆", "pieces": 36, "cols": 6 },
+    { "id": "master", "name": "Master", "stars": "★★★★★", "pieces": 49, "cols": 7 }
+  ],
+  "backgrounds": {
+    "dialogue-beach": "assets/images/backgrounds/dialogue-beach.png",
+    "dialogue-nightpool": "assets/images/backgrounds/dialogue-nightpool.png",
+    "dialogue-tropical": "assets/images/backgrounds/dialogue-tropical.png"
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "nameEntry": [
+    { "speaker": "VENUS", "text": "ようこそ、Midnight Club Venus へ——" },
+    { "speaker": "VENUS", "text": "私はヴィーナス。このクラブの案内役よ" },
+    { "speaker": "VENUS", "text": "あら…いい目をしてるわね。お名前を聞いてもいいかしら？" }
+  ],
+  "nameEntryAfter": [
+    { "speaker": "VENUS", "text": "{playerName}さん…ふふ、素敵な名前ね。覚えたわ♡" },
+    { "speaker": "VENUS", "text": "ここには楽しいゲームと…素敵な女の子たちが待ってるの" },
+    { "speaker": "VENUS", "text": "さぁ、中へどうぞ？あなたの夜は、まだ始まったばかりよ——" }
+  ],
+  "marina": {
+    "easy": {
+      "before": [
+        { "speaker": "MARINA", "text": "あっ！{playerName}さん？初めまして〜！あたしマリーナ！" },
+        { "speaker": "MARINA", "text": "今日めっちゃいい天気じゃん！一緒にビーチ来てくれたの？うれしー！" },
+        { "speaker": "MARINA", "text": "ねっ、まずは簡単なパズルやってみない？あたしの写真だよ〜えへへ♪" }
+      ],
+      "after": [
+        { "speaker": "MARINA", "text": "わーい！完成！{playerName}さんすごーい！" },
+        { "speaker": "MARINA", "text": "ふふっ、あたしの写真ちゃんと見てくれた？もっと見たくなったでしょ〜？" }
+      ]
+    },
+    "normal": {
+      "before": [
+        { "speaker": "MARINA", "text": "{playerName}くーん！また来てくれたんだ！待ってたよ〜♪" },
+        { "speaker": "MARINA", "text": "今日はちょっとだけ…大胆な写真にしてみたんだ〜。見たい？" },
+        { "speaker": "MARINA", "text": "ちょっと難しくなるけど、{playerName}くんなら大丈夫でしょ！" }
+      ],
+      "after": [
+        { "speaker": "MARINA", "text": "きゃっ！やっぱり見られると恥ずかしいかも…♡" },
+        { "speaker": "MARINA", "text": "でも…{playerName}くんに見てもらえてうれしいな" }
+      ]
+    },
+    "hard": {
+      "before": [
+        { "speaker": "MARINA", "text": "{playerName}…ねぇ、あたしのことどれくらい好き？" },
+        { "speaker": "MARINA", "text": "もっと近くで見たい？…だったらこのパズル、解いてみせて？" },
+        { "speaker": "MARINA", "text": "今回の写真ね…ちょっとドキドキするやつだから…覚悟してね？💕" }
+      ],
+      "after": [
+        { "speaker": "MARINA", "text": "…どう？ドキドキした？…あたしもしてる、実は" },
+        { "speaker": "MARINA", "text": "{playerName}くんにだから見せたんだよ…？わかってる？" }
+      ]
+    },
+    "expert": {
+      "before": [
+        { "speaker": "MARINA", "text": "{playerName}…今日はふたりきりだね" },
+        { "speaker": "MARINA", "text": "ねぇ…あたし、{playerName}くんのためにすっごいの用意しちゃった" },
+        { "speaker": "MARINA", "text": "でもね、簡単には見せてあげない。本気で解いてね…？ふふっ❤️" }
+      ],
+      "after": [
+        { "speaker": "MARINA", "text": "…見ちゃったね。{playerName}くんのえっち♡" },
+        { "speaker": "MARINA", "text": "でも嫌じゃないよ…むしろ…もっと見てほしいかも…" }
+      ]
+    },
+    "master": {
+      "before": [
+        { "speaker": "MARINA", "text": "…{playerName}" },
+        { "speaker": "MARINA", "text": "あのね…これ、誰にも見せたことないの" },
+        { "speaker": "MARINA", "text": "{playerName}くんだから…全部、見せたいって思ったの" },
+        { "speaker": "MARINA", "text": "最後のパズル…解いたら、あたしのこと…ぜんぶ知ることになるよ…？" },
+        { "speaker": "MARINA", "text": "…覚悟、できてる？❤️‍🔥" }
+      ],
+      "after": [
+        { "speaker": "MARINA", "text": "…はぁ…全部、見られちゃった…" },
+        { "speaker": "MARINA", "text": "{playerName}くん…あたしのこと、忘れないでね…？" },
+        { "speaker": "MARINA", "text": "…えへへ。大好き♡" }
+      ]
+    }
+  },
+  "luna": {
+    "easy": {
+      "before": [
+        { "speaker": "LUNA", "text": "…あなたが{playerName}？ふぅん、聞いてたのと違うわね" },
+        { "speaker": "LUNA", "text": "私はルナ。…別に、自己紹介したかったわけじゃないけど" },
+        { "speaker": "LUNA", "text": "パズル？いいわよ、やってみなさい。…簡単すぎて退屈しないといいけど" }
+      ],
+      "after": [
+        { "speaker": "LUNA", "text": "…へぇ、ちゃんとできるじゃない" },
+        { "speaker": "LUNA", "text": "次も来るの？…別に、来なくてもいいけど" }
+      ]
+    },
+    "normal": {
+      "before": [
+        { "speaker": "LUNA", "text": "…また来たの。{playerName}って意外とマメなのね" },
+        { "speaker": "LUNA", "text": "今回はちょっと露出が増えてるけど…見たいんでしょ？正直に言いなさい" },
+        { "speaker": "LUNA", "text": "…素直な人は嫌いじゃないわ" }
+      ],
+      "after": [
+        { "speaker": "LUNA", "text": "…そんなにまじまじ見ないでよ。…恥ずかしいじゃない" },
+        { "speaker": "LUNA", "text": "…次、もう少し見せてあげてもいいかなって…思ってるだけよ" }
+      ]
+    },
+    "hard": {
+      "before": [
+        { "speaker": "LUNA", "text": "{playerName}…あなた、私のこと攻略してるつもり？" },
+        { "speaker": "LUNA", "text": "…ちょっと悔しいけど、まんまとハマってる気がするわ" },
+        { "speaker": "LUNA", "text": "この写真…撮るとき、あなたのこと考えてた。…言わなきゃよかった" }
+      ],
+      "after": [
+        { "speaker": "LUNA", "text": "…あんまりじっと見ないで。心臓の音、聞こえちゃう" },
+        { "speaker": "LUNA", "text": "…{playerName}の前だと、クールでいられなくなる" }
+      ]
+    },
+    "expert": {
+      "before": [
+        { "speaker": "LUNA", "text": "{playerName}…もう隠すの疲れちゃった" },
+        { "speaker": "LUNA", "text": "…私ね、あなたに見てほしいの。こんな格好してる私のこと…" },
+        { "speaker": "LUNA", "text": "…笑わないでよ？本気なんだから" }
+      ],
+      "after": [
+        { "speaker": "LUNA", "text": "…こういう顔、他の人には絶対見せないから" },
+        { "speaker": "LUNA", "text": "{playerName}だけ。…{playerName}だけよ…" }
+      ]
+    },
+    "master": {
+      "before": [
+        { "speaker": "LUNA", "text": "{playerName}…" },
+        { "speaker": "LUNA", "text": "私、ずっと壁を作ってきたの。でも…もう、いいかなって" },
+        { "speaker": "LUNA", "text": "最後のパズルを解いたら…私の全部が、あなたのものになる" },
+        { "speaker": "LUNA", "text": "…怖いけど…{playerName}となら…" },
+        { "speaker": "LUNA", "text": "…お願い、受け止めて…？" }
+      ],
+      "after": [
+        { "speaker": "LUNA", "text": "……ばか。…こんなに好きにさせて、どう責任取るのよ" },
+        { "speaker": "LUNA", "text": "…{playerName}。……ずっと、そばにいて" }
+      ]
+    }
+  },
+  "coral": {
+    "easy": {
+      "before": [
+        { "speaker": "CORAL", "text": "あら〜♪ {playerName}くん？いらっしゃ〜い♡" },
+        { "speaker": "CORAL", "text": "お姉さんがコーラルよ〜。よろしくね？" },
+        { "speaker": "CORAL", "text": "パズル、一緒にやりましょ♪ ゆっくりでいいからね〜" }
+      ],
+      "after": [
+        { "speaker": "CORAL", "text": "上手〜♡ {playerName}くん、才能あるんじゃな〜い？" },
+        { "speaker": "CORAL", "text": "ご褒美に…もうちょっとだけサービスしちゃおっかな〜♪" }
+      ]
+    },
+    "normal": {
+      "before": [
+        { "speaker": "CORAL", "text": "{playerName}く〜ん♡ お姉さんのこと、気になっちゃった？" },
+        { "speaker": "CORAL", "text": "うふふ、今日はちょっとだけ大胆にしてみたの〜" },
+        { "speaker": "CORAL", "text": "{playerName}くんの反応が楽しみだなぁ〜♡" }
+      ],
+      "after": [
+        { "speaker": "CORAL", "text": "きゃん♡ そんな食い入るように見られたら…お姉さん照れちゃう〜" },
+        { "speaker": "CORAL", "text": "…でも、もっと見てほしいかも？なぁんてね♪" }
+      ]
+    },
+    "hard": {
+      "before": [
+        { "speaker": "CORAL", "text": "{playerName}くん…お姉さんと、もっと仲良くなりたい？" },
+        { "speaker": "CORAL", "text": "今日の写真ね…お姉さん、{playerName}くんのためにがんばっちゃった♡" },
+        { "speaker": "CORAL", "text": "ドキドキしながら解いてね…？お姉さんもドキドキしてるから…♡" }
+      ],
+      "after": [
+        { "speaker": "CORAL", "text": "{playerName}くん…今、どんな気持ち？♡" },
+        { "speaker": "CORAL", "text": "お姉さんね、{playerName}くんに見てもらえるのが一番うれしいの…" }
+      ]
+    },
+    "expert": {
+      "before": [
+        { "speaker": "CORAL", "text": "{playerName}くん…今日は、お姉さんのワガママ聞いてくれる？" },
+        { "speaker": "CORAL", "text": "あのね…もう隠すところ、あんまりないの…♡" },
+        { "speaker": "CORAL", "text": "でもね…{playerName}くんになら、全部見せたいって思っちゃうの…いけない子かな？♡" }
+      ],
+      "after": [
+        { "speaker": "CORAL", "text": "…{playerName}くんの目、すっごく熱い…♡" },
+        { "speaker": "CORAL", "text": "お姉さんのこと…そんな目で見ちゃダメだよ？…なんてね、もっと見て♡" }
+      ]
+    },
+    "master": {
+      "before": [
+        { "speaker": "CORAL", "text": "{playerName}くん…" },
+        { "speaker": "CORAL", "text": "お姉さんね…{playerName}くんのこと、もうただの\"くん\"って呼べないかも…" },
+        { "speaker": "CORAL", "text": "最後の写真…これはね、{playerName}くんだけのために撮ったの" },
+        { "speaker": "CORAL", "text": "本当に…誰にも見せたことない姿だから…" },
+        { "speaker": "CORAL", "text": "お姉さんの全部…受け取って？♡" }
+      ],
+      "after": [
+        { "speaker": "CORAL", "text": "…{playerName}くん…ううん、{playerName}…♡" },
+        { "speaker": "CORAL", "text": "もう\"お姉さん\"はおしまい。…私のこと、名前で呼んで…？" },
+        { "speaker": "CORAL", "text": "コーラルって…呼んで♡" }
+      ]
+    }
+  }
+}
