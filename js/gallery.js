@@ -73,16 +73,34 @@ const Gallery = (() => {
       const charData = characters[charId];
       const fullyCleared = isCharFullyCleared(charId);
 
-      // Profile card — appears when all 5 stages cleared
-      if (fullyCleared && currentFilter !== 'favourites') {
-        const profileEl = document.createElement('div');
-        profileEl.className = 'gallery-profile-card';
-        profileEl.innerHTML = `
-          <img src="${charData.images.portrait}" alt="${charData.name}">
-          <div class="profile-badge">COMPLETE</div>
-        `;
-        profileEl.addEventListener('click', () => openProfile(charId));
-        grid.appendChild(profileEl);
+      // Difficulty images for this char (VIP only for neon)
+      const charDiffsForCard = (charId === 'neon') ? characters.difficulties : characters.difficulties.filter(d => d.id !== 'vip');
+
+      if (charId === 'neon') {
+        // NEON: portrait + profile unlocks when ANY neon image is unlocked
+        const anyNeonUnlocked = charDiffsForCard.some(d => Storage.isGalleryUnlocked('neon', d.id));
+        if (anyNeonUnlocked && currentFilter !== 'favourites') {
+          const profileEl = document.createElement('div');
+          profileEl.className = 'gallery-profile-card';
+          profileEl.innerHTML = `
+            <img src="${charData.images.portrait}" alt="${charData.name}">
+            ${fullyCleared ? '<div class="profile-badge">COMPLETE</div>' : '<div class="profile-badge" style="background:rgba(255,105,180,0.8);">PROFILE</div>'}
+          `;
+          profileEl.addEventListener('click', () => openProfile(charId));
+          grid.appendChild(profileEl);
+        }
+      } else {
+        // Other chars: profile card only when all stages cleared
+        if (fullyCleared && currentFilter !== 'favourites') {
+          const profileEl = document.createElement('div');
+          profileEl.className = 'gallery-profile-card';
+          profileEl.innerHTML = `
+            <img src="${charData.images.portrait}" alt="${charData.name}">
+            <div class="profile-badge">COMPLETE</div>
+          `;
+          profileEl.addEventListener('click', () => openProfile(charId));
+          grid.appendChild(profileEl);
+        }
       }
 
       // Difficulty images (VIP only for neon)

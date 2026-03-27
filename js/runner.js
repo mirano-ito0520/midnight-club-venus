@@ -122,7 +122,7 @@ const RunnerGame = (() => {
   // State
   let canvas, ctx, animId;
   let diffId, targetScore, config;
-  let charX, charY, charVY, groundY, isJumping, holdingJump;
+  let charX, charY, charVY, groundY, isJumping, holdingJump, canDoubleJump;
   let speed, score, bestScore, gameOver, targetReached;
   let obstacles, items, particles;
   let frameCount;
@@ -185,6 +185,7 @@ const RunnerGame = (() => {
     charVY = 0;
     isJumping = false;
     holdingJump = false;
+    canDoubleJump = false;
     speed = config.baseSpeed;
     score = 0;
     const progress = Storage.getProgress('neon', diffId);
@@ -237,8 +238,15 @@ const RunnerGame = (() => {
 
   function jump() {
     if (charY >= groundY - CHAR_H - 2) {
+      // Ground jump
       charVY = JUMP_FORCE;
       isJumping = true;
+      canDoubleJump = true;
+      App.SE.play('piece-snap');
+    } else if (canDoubleJump) {
+      // Double jump (slightly weaker)
+      charVY = JUMP_FORCE * 0.75;
+      canDoubleJump = false;
       App.SE.play('piece-snap');
     }
   }
@@ -271,6 +279,7 @@ const RunnerGame = (() => {
         charY = groundY - CHAR_H;
         charVY = 0;
         isJumping = false;
+        canDoubleJump = false;
       }
     }
 

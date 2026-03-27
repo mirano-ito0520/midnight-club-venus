@@ -159,7 +159,10 @@ const SlotMachine = (() => {
     spinning = false;
     spinCount = 0;
 
-    document.getElementById('slots-venus-msg').textContent = '「運命を試してみる？♡」';
+    const settai = isMilanoMode();
+    document.getElementById('slots-venus-msg').textContent = settai
+      ? '「オーナー様専用…接待モードよ♡」'
+      : '「運命を試してみる？♡」';
     document.getElementById('slots-count').textContent = '';
     for (let i = 0; i < 3; i++) {
       const r = document.getElementById(`reel-${i}`);
@@ -200,7 +203,27 @@ const SlotMachine = (() => {
     }, 100);
 
     // Determine results
-    const results = [randomSymbol(), randomSymbol(), randomSymbol()];
+    let results;
+    if (isMilanoMode()) {
+      // 接待モード: high win rate for owner demonstration
+      const roll = Math.random();
+      if (roll < 0.50) {
+        // 50%: 3-of-a-kind jackpot
+        const sym = randomSymbol();
+        results = [sym, sym, sym];
+      } else if (roll < 0.80) {
+        // 30%: 2-of-a-kind near miss
+        const sym = randomSymbol();
+        let third = randomSymbol();
+        while (third === sym) third = randomSymbol();
+        results = [sym, sym, third];
+      } else {
+        // 20%: random
+        results = [randomSymbol(), randomSymbol(), randomSymbol()];
+      }
+    } else {
+      results = [randomSymbol(), randomSymbol(), randomSymbol()];
+    }
 
     // Stop reels one by one
     setTimeout(() => stopReel(0, results[0], spinInterval), 800);
