@@ -99,28 +99,28 @@ const RunnerGame = (() => {
     vip:    { baseSpeed: 8.5, speedUp: 0.003,  obsDensity: 0.028, itemDensity: 0.008 },
   };
 
-  const GRAVITY = 0.6;
-  const JUMP_FORCE = -13;
-  const HOLD_BOOST = -0.4;
-  const MAX_JUMP_VY = -18;
-  const CHAR_W = 60;
-  const CHAR_H = 80;
-  const GROUND_OFFSET = 50;
+  const GRAVITY = 0.7;
+  const JUMP_FORCE = -15;
+  const HOLD_BOOST = -0.5;
+  const MAX_JUMP_VY = -21;
+  const CHAR_W = 90;
+  const CHAR_H = 120;
+  const GROUND_OFFSET = 70;
 
   const OBS_TYPES = [
-    { name: 'chair', w: 40, h: 35, color: '#ff6b6b', emoji: '🪑' },
-    { name: 'drunk', w: 35, h: 55, color: '#ffa94d', emoji: '🕺' },
-    { name: 'rope',  w: 55, h: 25, color: '#e599f7', emoji: '🚧' },
+    { name: 'chair', w: 55, h: 50, color: '#ff6b6b', emoji: '🪑' },
+    { name: 'drunk', w: 50, h: 75, color: '#ffa94d', emoji: '🕺' },
+    { name: 'rope',  w: 75, h: 35, color: '#e599f7', emoji: '🚧' },
   ];
 
   const ITEM_TYPES = [
-    { name: 'crystal',  value: 100,  weight: 60, color: '#00e5ff', emoji: '💎', size: 22 },
-    { name: 'cocktail', value: 300,  weight: 30, color: '#ff69b4', emoji: '🍸', size: 24 },
-    { name: 'crown',    value: 1000, weight: 10, color: '#ffd700', emoji: '👑', size: 26 },
+    { name: 'crystal',  value: 100,  weight: 60, color: '#00e5ff', emoji: '💎', size: 30 },
+    { name: 'cocktail', value: 300,  weight: 30, color: '#ff69b4', emoji: '🍸', size: 32 },
+    { name: 'crown',    value: 1000, weight: 10, color: '#ffd700', emoji: '👑', size: 34 },
   ];
 
   const COIN_DENSITY = 0.008;
-  const COIN_SIZE = 20;
+  const COIN_SIZE = 28;
   const COIN_COLOR = '#ffd700';
 
   // State

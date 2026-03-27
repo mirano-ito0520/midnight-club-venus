@@ -579,23 +579,25 @@ const VenusRoulette = (() => {
   let streak = 0;
   const GOAL = 10;
 
-  // Pattern-based: VENUS lines hint at the answer
-  // Key words: 左/left hints → left, 右/right hints → right
+  // Pattern: lines ending with ♡ → right, otherwise → left
+  // No directional words — pattern is hidden in tone/ending
   const rounds = [
-    { line: '「月は……左の空が美しいわ」', answer: 'left' },
-    { line: '「右手には運命の糸が絡まっているの♡」', answer: 'right' },
-    { line: '「心臓は左にあるもの……感じる方を選んで」', answer: 'left' },
-    { line: '「正しい道はいつも右よ——right, isn\'t it?」', answer: 'right' },
-    { line: '「残された時間は……もう左程ないわ」', answer: 'left' },
-    { line: '「あなたの右腕になりたいの♡」', answer: 'right' },
-    { line: '「左遷されたって構わない……あなたの隣なら」', answer: 'left' },
-    { line: '「権利(right)を主張するわ……あなたを愛する権利を♡」', answer: 'right' },
-    { line: '「左利きの人って……特別な才能があるって知ってた？」', answer: 'left' },
-    { line: '「右に出る者はいない——あなた以外にはね♡」', answer: 'right' },
-    { line: '「ひだりの扉を開けて……秘密が待っているわ」', answer: 'left' },
-    { line: '「みぎわの風が気持ちいい夜ね♡」', answer: 'right' },
-    { line: '「佐(left radical)という字には……人を助ける意味があるの」', answer: 'left' },
-    { line: '「右に曲がれば……私の部屋よ♡」', answer: 'right' },
+    { line: '「今夜のあなた、いつもより素敵ね♡」', answer: 'right' },
+    { line: '「夜が深まると……本当の姿が見えてくるものよ」', answer: 'left' },
+    { line: '「私のこと、ちゃんと見ていてくれる♡」', answer: 'right' },
+    { line: '「すべてが正しいとは限らないわ……」', answer: 'left' },
+    { line: '「このドキドキ……嫌いじゃないの♡」', answer: 'right' },
+    { line: '「この先に何があるか……あなたには分からないでしょう？」', answer: 'left' },
+    { line: '「もっと近くに来て……いいのよ♡」', answer: 'right' },
+    { line: '「静かに……耳を澄ませてみて」', answer: 'left' },
+    { line: '「あなたの選択、信じてるわ♡」', answer: 'right' },
+    { line: '「真実はいつも……隠されているもの」', answer: 'left' },
+    { line: '「ふふ……その迷いが可愛いの♡」', answer: 'right' },
+    { line: '「月明かりが眩しい……そう思わない？」', answer: 'left' },
+    { line: '「素直な人って……好きよ♡」', answer: 'right' },
+    { line: '「答えは……あなたの中にあるわ。」', answer: 'left' },
+    { line: '「もう少し遊んでいかない♡」', answer: 'right' },
+    { line: '「運命って……残酷よね。」', answer: 'left' },
   ];
 
   let shuffled = [];
@@ -606,7 +608,7 @@ const VenusRoulette = (() => {
     roundIdx = 0;
     shuffled = shuffle([...rounds]);
     App.goTo('roulette', { bgm: 'gallery' });
-    document.getElementById('roulette-msg').textContent = '「セリフの中に答えがあるわ……♡」';
+    document.getElementById('roulette-msg').textContent = '「私の言葉を……よく聞いてね」';
     document.getElementById('roulette-streak').textContent = `0 / ${GOAL}`;
 
     document.getElementById('roulette-left').onclick = () => choose('left');
@@ -654,7 +656,7 @@ const VenusRoulette = (() => {
 
       msgEl.textContent = streak >= 7 ? '「あと少し……集中して♡」' : '「正解♡ 次はどうかしら」';
     } else {
-      msgEl.textContent = '「残念……答えはセリフの中にあったのに♡」';
+      msgEl.textContent = '「残念ね……私の気持ち、まだ読めてないみたい」';
       App.SE.play('button-click');
       streak = 0;
       roundIdx = 0;
