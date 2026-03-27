@@ -136,14 +136,26 @@ const ROULETTE_IMGS = {
   venus: 'assets/images/characters/roulette/venus.png',
 };
 
-// Weighted symbol pool: venus is rare (8%), neon slightly rare (17%)
+// Weighted symbol pool with skull and cherry
 const REEL_POOL = [
   'marina','marina','marina',
   'luna','luna','luna',
   'coral','coral','coral',
-  'neon','neon', // 2 out of 12
-  'venus', // 1 out of 12 ≈ 8%
+  'neon','neon',
+  'venus',
+  'cherry','cherry','cherry',
+  'skull','skull',
 ];
+
+const REEL_DISPLAY = {
+  marina: { img: true },
+  luna: { img: true },
+  coral: { img: true },
+  neon: { img: true },
+  venus: { img: true },
+  cherry: { emoji: '🍒', color: '#ff4444' },
+  skull: { emoji: '💀', color: '#888' },
+};
 
 function randomSymbol() {
   return REEL_POOL[Math.floor(Math.random() * REEL_POOL.length)];
@@ -163,7 +175,7 @@ const SlotMachine = (() => {
     document.getElementById('slots-venus-msg').textContent = settai
       ? '「オーナー様専用…接待モードよ♡」'
       : '「運命を試してみる？♡」';
-    document.getElementById('slots-count').textContent = '';
+    updateCoinDisplay();
     for (let i = 0; i < 3; i++) {
       const r = document.getElementById(`reel-${i}`);
       r.innerHTML = '<span style="font-size:28px;color:var(--text-muted);">?</span>';
@@ -179,11 +191,34 @@ const SlotMachine = (() => {
 
   function setReelImg(index, symbol) {
     const r = document.getElementById(`reel-${index}`);
-    r.innerHTML = `<img src="${ROULETTE_IMGS[symbol]}" alt="${symbol}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+    const display = REEL_DISPLAY[symbol];
+    if (display && display.img && ROULETTE_IMGS[symbol]) {
+      r.innerHTML = `<img src="${ROULETTE_IMGS[symbol]}" alt="${symbol}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+    } else if (display) {
+      r.innerHTML = `<span style="font-size:36px;">${display.emoji}</span>`;
+    }
+  }
+
+  function updateCoinDisplay() {
+    const el = document.getElementById('slots-count');
+    if (isMilanoMode()) {
+      el.innerHTML = '🪙 ∞ <span style="font-size:10px;color:var(--neon-gold);">(接待モード)</span>';
+    } else {
+      el.textContent = `🪙 ${Storage.getCoins()}`;
+    }
   }
 
   function spin() {
     if (spinning) return;
+    // Coin cost check (owner exempt)
+    if (!isMilanoMode()) {
+      if (Storage.getCoins() < 10) {
+        document.getElementById('slots-venus-msg').textContent = '「コインが足りないわ……ランゲームで稼いできてね♡」';
+        return;
+      }
+      Storage.spendCoins(10);
+      updateCoinDisplay();
+    }
     spinning = true;
     spinCount++;
     App.SE.play('button-click');
@@ -203,23 +238,22 @@ const SlotMachine = (() => {
     }, 100);
 
     // Determine results
+    const charOnly = ['marina','luna','coral','neon','venus'];
+    function randomChar() { return charOnly[Math.floor(Math.random() * charOnly.length)]; }
     let results;
     if (isMilanoMode()) {
-      // 接待モード: high win rate for owner demonstration
+      // 接待モード: characters only, high win rate
       const roll = Math.random();
       if (roll < 0.50) {
-        // 50%: 3-of-a-kind jackpot
-        const sym = randomSymbol();
+        const sym = randomChar();
         results = [sym, sym, sym];
       } else if (roll < 0.80) {
-        // 30%: 2-of-a-kind near miss
-        const sym = randomSymbol();
-        let third = randomSymbol();
-        while (third === sym) third = randomSymbol();
+        const sym = randomChar();
+        let third = randomChar();
+        while (third === sym) third = randomChar();
         results = [sym, sym, third];
       } else {
-        // 20%: random
-        results = [randomSymbol(), randomSymbol(), randomSymbol()];
+        results = [randomChar(), randomChar(), randomChar()];
       }
     } else {
       results = [randomSymbol(), randomSymbol(), randomSymbol()];
@@ -245,12 +279,55 @@ const SlotMachine = (() => {
     App.SE.play('piece-snap');
 
     spinning = false;
-    document.getElementById('slots-count').textContent = `Spins: ${spinCount}`;
+    updateCoinDisplay();
 
     const msgEl = document.getElementById('slots-venus-msg');
     const allSame = results[0] === results[1] && results[1] === results[2];
+
+    // Count specific symbols
+    const cherryCount = results.filter(s => s === 'cherry').length;
+    const skullCount = results.filter(s => s === 'skull').length;
+
+    // --- Skull 3x: lose all coins ---
+    if (allSame && results[0] === 'skull') {
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`reel-${i}`).className = 'slots-reel jackpot';
+        document.getElementById(`reel-${i}`).style.borderColor = '#ff4444';
+      }
+      if (!isMilanoMode()) Storage.setCoins(0);
+      updateCoinDisplay();
+      App.SE.play('door-open');
+      msgEl.innerHTML = '「💀💀💀……全額没収よ♡」';
+      setTimeout(() => {
+        for (let i = 0; i < 3; i++) document.getElementById(`reel-${i}`).style.borderColor = '';
+      }, 2000);
+      return;
+    }
+
+    // --- Cherry payouts ---
+    if (cherryCount > 0 && !allSame) {
+      const payout = cherryCount === 1 ? 1 : cherryCount === 2 ? 3 : 10;
+      if (!isMilanoMode()) Storage.addCoins(payout);
+      updateCoinDisplay();
+      App.SE.play('piece-snap');
+      msgEl.textContent = `「🍒×${cherryCount}！${payout}コイン獲得♡」`;
+      return;
+    }
+
+    // --- Cherry 3x jackpot ---
+    if (allSame && results[0] === 'cherry') {
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`reel-${i}`).className = 'slots-reel jackpot';
+      }
+      if (!isMilanoMode()) Storage.addCoins(10);
+      updateCoinDisplay();
+      App.SE.play('puzzle-clear');
+      msgEl.textContent = '「🍒🍒🍒 チェリーボーナス！10コイン♡」';
+      return;
+    }
+
     const isVenusJackpot = allSame && results[0] === 'venus';
-    const isGirlJackpot = allSame && results[0] !== 'venus';
+    const isCharJackpot = allSame && ['marina','luna','coral','neon'].includes(results[0]);
 
     if (isVenusJackpot) {
       // VENUS×3 = QUEEN直行！
@@ -266,7 +343,7 @@ const SlotMachine = (() => {
       Storage.set('vip_neon', true);
       Storage.set('queenUnlocked', true);
       setTimeout(() => openQueenGallery(), 3000);
-    } else if (isGirlJackpot) {
+    } else if (isCharJackpot) {
       // Girls×3 = その子だけVIP解放
       for (let i = 0; i < 3; i++) {
         document.getElementById(`reel-${i}`).className = 'slots-reel jackpot';
@@ -497,20 +574,129 @@ const MidnightRoulette = (() => {
   return { start };
 })();
 
+/* ---- VENUS Pattern Roulette (secret code reward) ---- */
+const VenusRoulette = (() => {
+  let streak = 0;
+  const GOAL = 10;
+
+  // Pattern-based: VENUS lines hint at the answer
+  // Key words: 左/left hints → left, 右/right hints → right
+  const rounds = [
+    { line: '「月は……左の空が美しいわ」', answer: 'left' },
+    { line: '「右手には運命の糸が絡まっているの♡」', answer: 'right' },
+    { line: '「心臓は左にあるもの……感じる方を選んで」', answer: 'left' },
+    { line: '「正しい道はいつも右よ——right, isn\'t it?」', answer: 'right' },
+    { line: '「残された時間は……もう左程ないわ」', answer: 'left' },
+    { line: '「あなたの右腕になりたいの♡」', answer: 'right' },
+    { line: '「左遷されたって構わない……あなたの隣なら」', answer: 'left' },
+    { line: '「権利(right)を主張するわ……あなたを愛する権利を♡」', answer: 'right' },
+    { line: '「左利きの人って……特別な才能があるって知ってた？」', answer: 'left' },
+    { line: '「右に出る者はいない——あなた以外にはね♡」', answer: 'right' },
+    { line: '「ひだりの扉を開けて……秘密が待っているわ」', answer: 'left' },
+    { line: '「みぎわの風が気持ちいい夜ね♡」', answer: 'right' },
+    { line: '「佐(left radical)という字には……人を助ける意味があるの」', answer: 'left' },
+    { line: '「右に曲がれば……私の部屋よ♡」', answer: 'right' },
+  ];
+
+  let shuffled = [];
+  let roundIdx = 0;
+
+  function start() {
+    streak = 0;
+    roundIdx = 0;
+    shuffled = shuffle([...rounds]);
+    App.goTo('roulette', { bgm: 'gallery' });
+    document.getElementById('roulette-msg').textContent = '「セリフの中に答えがあるわ……♡」';
+    document.getElementById('roulette-streak').textContent = `0 / ${GOAL}`;
+
+    document.getElementById('roulette-left').onclick = () => choose('left');
+    document.getElementById('roulette-right').onclick = () => choose('right');
+    document.getElementById('roulette-back-btn').onclick = () => {
+      App.SE.play('button-click');
+      App.goTo('lobby', { bgm: 'lobby', noHistory: true });
+      Lobby.init();
+    };
+
+    setTimeout(() => showRound(), 1500);
+  }
+
+  function showRound() {
+    const r = shuffled[roundIdx % shuffled.length];
+    document.getElementById('roulette-msg').textContent = r.line;
+  }
+
+  function choose(side) {
+    const r = shuffled[roundIdx % shuffled.length];
+    const leftBtn = document.getElementById('roulette-left');
+    const rightBtn = document.getElementById('roulette-right');
+    leftBtn.disabled = true;
+    rightBtn.disabled = true;
+
+    const msgEl = document.getElementById('roulette-msg');
+
+    if (side === r.answer) {
+      streak++;
+      roundIdx++;
+      App.SE.play('piece-snap');
+      document.getElementById('roulette-streak').textContent = `${streak} / ${GOAL}`;
+
+      if (streak >= GOAL) {
+        msgEl.textContent = '「……すごい。全部見抜いたのね。\n1000コインをあなたに♡」';
+        msgEl.style.whiteSpace = 'pre-line';
+        App.SE.play('puzzle-clear');
+        Storage.addCoins(1000);
+        setTimeout(() => {
+          App.goTo('lobby', { bgm: 'lobby', noHistory: true });
+          Lobby.init();
+        }, 3000);
+        return;
+      }
+
+      msgEl.textContent = streak >= 7 ? '「あと少し……集中して♡」' : '「正解♡ 次はどうかしら」';
+    } else {
+      msgEl.textContent = '「残念……答えはセリフの中にあったのに♡」';
+      App.SE.play('button-click');
+      streak = 0;
+      roundIdx = 0;
+      shuffled = shuffle([...rounds]);
+    }
+
+    setTimeout(() => {
+      leftBtn.disabled = false;
+      rightBtn.disabled = false;
+      document.getElementById('roulette-streak').textContent = `${streak} / ${GOAL}`;
+      if (streak > 0) showRound();
+    }, 1200);
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  return { start };
+})();
+
 /* ---- Developer Mode: ミラノ ---- */
 function isMilanoMode() {
-  return Storage.get('playerName') === 'ミラノ';
+  return Storage.get('milanoMode') === true;
 }
 
-function applyMilanoMode() {
-  if (!isMilanoMode()) return;
+function activateMilanoMode() {
+  Storage.set('milanoMode', true);
   // Unlock absolutely everything
   const chars = ['marina', 'luna', 'coral', 'neon'];
   const diffs = ['easy', 'normal', 'hard', 'expert', 'master'];
   chars.forEach(c => diffs.forEach(d => Storage.setProgress(c, d, { cleared: true, bestTime: 1, bestScore: 99999 })));
   Storage.set('vipUnlocked', true);
   Storage.set('queenUnlocked', true);
-  // VIP個別フラグはセットしない（ミラノモードはisMilanoMode()で常時全解放）
+  Storage.set('vip_marina', true);
+  Storage.set('vip_luna', true);
+  Storage.set('vip_coral', true);
+  Storage.set('vip_neon', true);
 }
 
 /* ---- VENUS Profile (entry point) ---- */
@@ -540,12 +726,16 @@ function openVenusProfile() {
   const portraitImg = modal.querySelector('.venus-profile-img');
   portraitImg.onclick = () => {
     venusTaps++;
-    if (venusTaps === 3) {
-      hint.innerHTML = '<div style="color:var(--neon-pink);font-size:12px;">「あら…何か探してるの？♡」</div>';
+    if (venusTaps >= 5 && venusTaps < 10) {
+      hint.innerHTML = `<div style="color:var(--neon-pink);font-size:12px;">「あら…何か探してるの？♡」(${venusTaps}/10)</div>`;
+    }
+    if (venusTaps === 10) {
+      hint.innerHTML = '<div style="color:var(--neon-gold);font-size:12px;">「…ふふ。最後の試練を受ける覚悟はある？♡」</div>';
+      App.SE.play('stage-unlock');
       setTimeout(() => {
         modal.style.display = 'none';
-        SlotMachine.start();
-      }, 800);
+        VenusRoulette.start();
+      }, 1200);
     }
   };
 

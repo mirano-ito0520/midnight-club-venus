@@ -84,16 +84,6 @@ const NameEntry = (() => {
     Storage.set('playerName', name);
     document.getElementById('name-input-container').style.display = 'none';
 
-    // Developer mode: ミラノ
-    if (name === 'ミラノ') {
-      applyMilanoMode();
-      afterDialogues = [
-        { speaker: 'VENUS', text: 'ミラノさん……！お会いできて光栄です。' },
-        { speaker: 'VENUS', text: '当クラブのオーナー様がいらっしゃるなんて…今夜は特別な夜になりそう♡' },
-        { speaker: 'VENUS', text: 'すべてのお部屋、すべてのサービスをご用意しております——どうぞ、お楽しみくださいませ♡' },
-      ];
-    }
-
     phase = 'outro';
     currentIndex = 0;
     const text = afterDialogues[0].text.replace(/\{playerName\}/g, name);

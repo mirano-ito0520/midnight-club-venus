@@ -17,6 +17,8 @@ const Storage = (() => {
     gallery: {},
     // Favourites in gallery
     favourites: {},
+    // Coins for slot machine
+    coins: 0,
     // First launch flag
     firstLaunch: true,
   });
@@ -84,6 +86,31 @@ const Storage = (() => {
     return !!data.favourites[key];
   }
 
+  function getCoins() {
+    return load().coins || 0;
+  }
+
+  function addCoins(amount) {
+    const data = load();
+    data.coins = (data.coins || 0) + amount;
+    save(data);
+    return data.coins;
+  }
+
+  function spendCoins(amount) {
+    const data = load();
+    if ((data.coins || 0) < amount) return false;
+    data.coins -= amount;
+    save(data);
+    return true;
+  }
+
+  function setCoins(amount) {
+    const data = load();
+    data.coins = amount;
+    save(data);
+  }
+
   function resetAll() {
     localStorage.removeItem(KEY);
   }
@@ -92,6 +119,7 @@ const Storage = (() => {
     load, save, get, set,
     getProgress, setProgress,
     isGalleryUnlocked, toggleFavourite, isFavourite,
+    getCoins, addCoins, spendCoins, setCoins,
     resetAll, defaultData,
   };
 })();

@@ -119,12 +119,17 @@ const RunnerGame = (() => {
     { name: 'crown',    value: 1000, weight: 10, color: '#ffd700', emoji: '👑', size: 26 },
   ];
 
+  const COIN_DENSITY = 0.008;
+  const COIN_SIZE = 20;
+  const COIN_COLOR = '#ffd700';
+
   // State
   let canvas, ctx, animId;
   let diffId, targetScore, config;
   let charX, charY, charVY, groundY, isJumping, holdingJump, canDoubleJump;
   let speed, score, bestScore, gameOver, targetReached;
-  let obstacles, items, particles;
+  let obstacles, items, coins, particles;
+  let coinCount;
   let frameCount;
   let runImg, jumpImg, stageImg, galleryImg;
   let galleryAlpha, galleryFadeDir, galleryTimer;
@@ -194,14 +199,35 @@ const RunnerGame = (() => {
     targetReached = false;
     obstacles = [];
     items = [];
+    coins = [];
     particles = [];
+    coinCount = 0;
     frameCount = 0;
     bgScrollX = 0;
 
     updateHUD();
-    bindInput();
     bindExit();
-    animId = requestAnimationFrame(gameLoop);
+    showTapToStart();
+  }
+
+  function showTapToStart() {
+    const area = document.getElementById('runner-area');
+    const overlay = document.createElement('div');
+    overlay.className = 'runner-tap-start';
+    overlay.innerHTML = `
+      <div class="runner-tap-start-text">TAP TO START</div>
+      <div class="runner-tap-start-hint">タップでスタート</div>
+    `;
+    area.appendChild(overlay);
+
+    function go(e) {
+      if (e.preventDefault) e.preventDefault();
+      overlay.remove();
+      bindInput();
+      animId = requestAnimationFrame(gameLoop);
+    }
+    overlay.addEventListener('click', go);
+    overlay.addEventListener('touchend', (e) => { e.preventDefault(); go(e); }, { passive: false });
   }
 
   // ---- Input ----
@@ -286,12 +312,15 @@ const RunnerGame = (() => {
     // Spawn
     if (Math.random() < config.obsDensity && canSpawn()) spawnObstacle();
     if (Math.random() < config.itemDensity && canSpawn()) spawnItem();
+    if (Math.random() < COIN_DENSITY) spawnCoin();
 
     // Move
     obstacles.forEach(o => { o.x -= speed; });
     obstacles = obstacles.filter(o => o.x + o.w > -20);
     items.forEach(i => { i.x -= speed; });
     items = items.filter(i => i.x + i.size > -20);
+    coins.forEach(c => { c.x -= speed; c.bobPhase += 0.1; });
+    coins = coins.filter(c => c.x + COIN_SIZE > -20);
 
     // Particles
     particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life--; });
@@ -316,6 +345,24 @@ const RunnerGame = (() => {
             x: i.x + i.size / 2, y: i.y + i.size / 2,
             vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
             color: i.color, life: 20,
+          });
+        }
+        return false;
+      }
+      return true;
+    });
+
+    // Collision: coins
+    coins = coins.filter(c => {
+      if (aabb(hb, { x: c.x, y: c.y, w: COIN_SIZE, h: COIN_SIZE })) {
+        coinCount++;
+        Storage.addCoins(1);
+        App.SE.play('piece-snap');
+        for (let p = 0; p < 4; p++) {
+          particles.push({
+            x: c.x + COIN_SIZE / 2, y: c.y + COIN_SIZE / 2,
+            vx: (Math.random() - 0.5) * 3, vy: (Math.random() - 0.5) * 3,
+            color: COIN_COLOR, life: 15,
           });
         }
         return false;
@@ -385,6 +432,15 @@ const RunnerGame = (() => {
     });
   }
 
+  function spawnCoin() {
+    const airborne = Math.random() < 0.5;
+    coins.push({
+      x: canvas.width + 20,
+      y: airborne ? groundY - CHAR_H - 20 - Math.random() * 50 : groundY - COIN_SIZE - 5,
+      bobPhase: Math.random() * Math.PI * 2,
+    });
+  }
+
   function aabb(a, b) {
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   }
@@ -397,6 +453,7 @@ const RunnerGame = (() => {
     drawGround();
     obstacles.forEach(o => drawObstacle(o));
     items.forEach(i => drawItem(i));
+    coins.forEach(c => drawCoin(c));
     drawParticles();
     drawCharacter();
   }
@@ -487,6 +544,19 @@ const RunnerGame = (() => {
     ctx.fillText(i.emoji, i.x + i.size / 2, i.y + i.size / 2);
   }
 
+  function drawCoin(c) {
+    const bobY = c.y + Math.sin(c.bobPhase) * 3;
+    ctx.save();
+    ctx.shadowColor = COIN_COLOR; ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(c.x + COIN_SIZE / 2, bobY + COIN_SIZE / 2, COIN_SIZE / 2, 0, Math.PI * 2);
+    ctx.fillStyle = COIN_COLOR + '40'; ctx.fill();
+    ctx.restore();
+    ctx.font = `${COIN_SIZE}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🪙', c.x + COIN_SIZE / 2, bobY + COIN_SIZE / 2);
+  }
+
   function drawParticles() {
     particles.forEach(p => {
       ctx.save();
@@ -500,7 +570,9 @@ const RunnerGame = (() => {
   function updateHUD() {
     const scoreEl = document.getElementById('runner-score');
     const targetEl = document.getElementById('runner-target');
+    const coinEl = document.getElementById('runner-coins');
     if (scoreEl) scoreEl.textContent = score.toLocaleString();
+    if (coinEl) coinEl.textContent = `🪙 ${coinCount}`;
     if (targetEl) {
       if (targetReached) {
         targetEl.textContent = '✨ UNLOCKED!';

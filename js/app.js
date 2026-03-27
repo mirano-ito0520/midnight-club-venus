@@ -357,19 +357,7 @@ const App = (() => {
     nameSaveBtn.addEventListener('click', () => {
       const name = nameInput.value.trim();
       if (!name) return;
-      const oldName = Storage.get('playerName') || '';
-      const wasMilano = oldName === 'ミラノ';
-      const isMilano = name === 'ミラノ';
-
-      if ((wasMilano && !isMilano) || (!wasMilano && isMilano)) {
-        // Name change involving ミラノ → PUNISHMENT
-        Storage.set('playerName', name);
-        triggerPunishment();
-        return;
-      }
-
       Storage.set('playerName', name);
-      if (isMilano) applyMilanoMode();
       Lobby.updateSpeech();
     });
 
@@ -430,22 +418,13 @@ const App = (() => {
     msgEl.style.display = 'block';
 
     if (code === 'VENUS') {
-      unlockAll();
-      msgEl.textContent = '🔓 All stages & gallery unlocked!';
-      msgEl.style.color = 'var(--neon-gold)';
-      App.SE.play('stage-unlock');
+      msgEl.textContent = '';
+      document.getElementById('settings-modal').style.display = 'none';
+      openVenusProfile();
     } else if (code === 'MIDNIGHT') {
-      // Check if all unlocked
-      const allCleared = isEverythingUnlocked();
-      if (allCleared) {
-        msgEl.textContent = '';
-        // Close settings, open VENUS profile
-        document.getElementById('settings-modal').style.display = 'none';
-        openVenusProfile();
-      } else {
-        msgEl.innerHTML = '💋 VENUSより：<br>「ふふ…秘密のパスワードを知ってるのね。<br>でも、まだ早いわ。全部クリアしてからね♡」';
-        msgEl.style.color = 'var(--neon-pink)';
-      }
+      msgEl.textContent = '';
+      document.getElementById('settings-modal').style.display = 'none';
+      SlotMachine.start();
     } else {
       msgEl.textContent = '…？ 違うみたいよ';
       msgEl.style.color = 'var(--text-muted)';
@@ -493,10 +472,10 @@ const App = (() => {
             bannedText.textContent = '……特別に、もう一度だけチャンスをあげる。';
           }
           setTimeout(() => location.reload(), 2000);
-        } else {
-          unlockAll();
+        } else if (getCurrentScene() === 'lobby') {
+          // ロビーでコナミ → オーナー認証フロー
           App.SE.play('stage-unlock');
-          alert('🎮 Konami Code activated! All unlocked!');
+          showOwnerAuth();
         }
       }
     } else {
@@ -535,6 +514,70 @@ const App = (() => {
         advanceKonami(dy > 0 ? 'down' : 'up');
       }
     }, { passive: true });
+  }
+
+  /* ---- Owner Authentication (Konami in Lobby) ---- */
+  function showOwnerAuth() {
+    // Hide cabinets, make VENUS prominent
+    const cabinets = document.getElementById('lobby-cabinets');
+    const header = document.querySelector('.lobby-header');
+    const speechEl = document.getElementById('lobby-venus-speech');
+    if (cabinets) cabinets.style.display = 'none';
+    if (header) header.style.display = 'none';
+
+    // VENUS asks for password
+    speechEl.textContent = '……あら。その合図を知っているのは——\n合言葉をどうぞ。';
+    speechEl.style.whiteSpace = 'pre-line';
+
+    // Create input overlay
+    const lobby = document.getElementById('scene-lobby');
+    const inputBox = document.createElement('div');
+    inputBox.id = 'owner-auth-box';
+    inputBox.style.cssText = 'position:absolute;bottom:100px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:8px;align-items:center;';
+    inputBox.innerHTML = `
+      <input type="text" id="owner-auth-input" class="name-input" placeholder="合言葉" maxlength="20" autocomplete="off" style="width:160px;">
+      <button class="neon-btn-sm" id="owner-auth-submit">Enter</button>
+    `;
+    lobby.appendChild(inputBox);
+
+    const input = document.getElementById('owner-auth-input');
+    const submit = document.getElementById('owner-auth-submit');
+
+    function tryAuth() {
+      const code = input.value.trim();
+      if (!code) return;
+      inputBox.remove();
+
+      if (code === 'ミラノ') {
+        // SUCCESS — activate owner mode
+        activateMilanoMode();
+        speechEl.style.color = '#d4af37';
+        speechEl.textContent = 'ようこそ、オーナー様。\n当クラブのすべてはあなたのために——♡';
+        App.SE.play('puzzle-clear');
+        setTimeout(() => {
+          speechEl.style.color = '';
+          speechEl.style.whiteSpace = '';
+          if (cabinets) cabinets.style.display = '';
+          if (header) header.style.display = '';
+          Lobby.init();
+        }, 2500);
+      } else {
+        // WRONG — punishment
+        speechEl.textContent = '……違うわね。偽物は、許さない。';
+        speechEl.style.color = '#ff4444';
+        setTimeout(() => {
+          speechEl.style.color = '';
+          speechEl.style.whiteSpace = '';
+          if (cabinets) cabinets.style.display = '';
+          if (header) header.style.display = '';
+          triggerPunishment();
+        }, 1500);
+      }
+    }
+
+    submit.addEventListener('click', tryAuth);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryAuth(); });
+    input.focus();
   }
 
   return { init, goTo, goBack, getCurrentScene, BGM, SE };

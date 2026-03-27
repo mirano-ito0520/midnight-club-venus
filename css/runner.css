@@ -97,6 +97,12 @@
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
+.runner-coin-display {
+  font-size: 13px;
+  color: #ffd700;
+  letter-spacing: 1px;
+}
+
 .runner-target-display {
   font-size: 11px;
   color: var(--neon-pink);
@@ -161,4 +167,33 @@
 .runner-gameover-actions {
   display: flex;
   gap: 12px;
+}
+
+/* ---- Tap to Start Overlay ---- */
+.runner-tap-start {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 0, 15, 0.75);
+  cursor: pointer;
+}
+
+.runner-tap-start-text {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  color: var(--neon-pink);
+  letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.runner-tap-start-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  letter-spacing: 2px;
 }

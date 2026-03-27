@@ -33,8 +33,8 @@ const Lobby = (() => {
 
     let speech;
     if (isMilanoMode()) {
-      // Developer special treatment
-      speech = `あら……ミラノさん。お待ちしておりました。\n当クラブのすべてはあなたのために用意されております——\nどうぞ、ごゆっくりお楽しみくださいませ♡`;
+      const playerName = Storage.get('playerName') || 'オーナー';
+      speech = `あら……${playerName}様。お待ちしておりました。\n当クラブのすべてはあなたのために用意されております——\nどうぞ、ごゆっくりお楽しみくださいませ♡`;
     } else if (totalCleared >= totalPuzzles) {
       speech = `あら…全部クリアしちゃったの？${playerName}さん、やるわね。\nでも安心して。このクラブには、まだまだ秘密があるから——`;
     } else {
