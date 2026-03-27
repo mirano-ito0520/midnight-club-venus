@@ -111,11 +111,7 @@
 
 .runner-area {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 65%;
-  max-height: 400px;
+  inset: 0;
   overflow: hidden;
   touch-action: none;
   -webkit-user-select: none;
