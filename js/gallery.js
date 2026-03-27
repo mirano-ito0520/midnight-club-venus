@@ -27,6 +27,12 @@ const Gallery = (() => {
     };
   }
 
+  function isCharFullyCleared(charId) {
+    const diffs = characters.difficulties;
+    const charDiffs = (charId === 'neon') ? diffs : diffs.filter(d => d.id !== 'vip');
+    return charDiffs.every(d => Storage.getProgress(charId, d.id)?.cleared);
+  }
+
   function renderFilters() {
     const container = document.getElementById('gallery-filters');
     container.innerHTML = '';
@@ -36,6 +42,7 @@ const Gallery = (() => {
       { id: 'marina', label: 'MARINA' },
       { id: 'luna', label: 'LUNA' },
       { id: 'coral', label: 'CORAL' },
+      { id: 'neon', label: 'NEON' },
       { id: 'favourites', label: '♥ Favourites' },
     ];
 
@@ -56,55 +63,69 @@ const Gallery = (() => {
     const grid = document.getElementById('gallery-grid');
     grid.innerHTML = '';
 
-    const playableChars = ['marina', 'luna', 'coral'];
+    const playableChars = ['marina', 'luna', 'coral', 'neon'];
     const diffs = characters.difficulties;
 
-    const items = [];
     playableChars.forEach(charId => {
-      diffs.forEach(diff => {
+      // Filter check
+      if (currentFilter !== 'all' && currentFilter !== 'favourites' && currentFilter !== charId) return;
+
+      const charData = characters[charId];
+      const fullyCleared = isCharFullyCleared(charId);
+
+      // Profile card — appears when all 5 stages cleared
+      if (fullyCleared && currentFilter !== 'favourites') {
+        const profileEl = document.createElement('div');
+        profileEl.className = 'gallery-profile-card';
+        profileEl.innerHTML = `
+          <img src="${charData.images.portrait}" alt="${charData.name}">
+          <div class="profile-badge">COMPLETE</div>
+        `;
+        profileEl.addEventListener('click', () => openProfile(charId));
+        grid.appendChild(profileEl);
+      }
+
+      // Difficulty images (VIP only for neon)
+      const charDiffs = (charId === 'neon') ? diffs : diffs.filter(d => d.id !== 'vip');
+      charDiffs.forEach(diff => {
         const key = `${charId}-${diff.id}`;
         const unlocked = Storage.isGalleryUnlocked(charId, diff.id);
         const isFav = Storage.isFavourite(key);
 
-        // Apply filter
         if (currentFilter === 'favourites' && !isFav) return;
-        if (currentFilter !== 'all' && currentFilter !== 'favourites' && currentFilter !== charId) return;
 
-        items.push({ charId, diffId: diff.id, key, unlocked, isFav });
+        const el = document.createElement('div');
+        el.className = 'gallery-item' + (unlocked ? '' : ' locked');
+
+        if (unlocked) {
+          const imgUrl = charData.images[diff.id];
+          el.innerHTML = `
+            <img src="${imgUrl}" alt="${charId} ${diff.id}">
+            ${isFav ? '<span class="fav-star">♥</span>' : ''}
+          `;
+          el.addEventListener('click', () => openLightbox({ charId, diffId: diff.id, key }));
+        } else {
+          el.innerHTML = `<img class="lock-icon" src="assets/images/ui/lock-silhouette.png" alt="Locked">`;
+        }
+
+        grid.appendChild(el);
       });
-    });
-
-    items.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'gallery-item' + (item.unlocked ? '' : ' locked');
-
-      if (item.unlocked) {
-        const charData = characters[item.charId];
-        const imgUrl = charData.images[item.diffId];
-        el.innerHTML = `
-          <img src="${imgUrl}" alt="${item.charId} ${item.diffId}">
-          ${item.isFav ? '<span class="fav-star">♥</span>' : ''}
-        `;
-        el.addEventListener('click', () => openLightbox(item));
-      } else {
-        el.innerHTML = `<img class="lock-icon" src="assets/images/ui/lock-silhouette.png" alt="Locked">`;
-      }
-
-      grid.appendChild(el);
     });
   }
 
   function renderProgress() {
     const container = document.getElementById('gallery-progress');
-    const playableChars = ['marina', 'luna', 'coral'];
+    const playableChars = ['marina', 'luna', 'coral', 'neon'];
     const diffs = characters.difficulties;
     let unlocked = 0;
-    const total = playableChars.length * diffs.length;
+    let total = 0;
 
     playableChars.forEach(c => {
-      diffs.forEach(d => {
+      const cDiffs = (c === 'neon') ? diffs : diffs.filter(d => d.id !== 'vip');
+      cDiffs.forEach(d => {
         if (Storage.isGalleryUnlocked(c, d.id)) unlocked++;
       });
+      total += cDiffs.length;
     });
 
     const percent = total > 0 ? Math.round((unlocked / total) * 100) : 0;
@@ -116,10 +137,48 @@ const Gallery = (() => {
     `;
   }
 
+  function openProfile(charId) {
+    const charData = characters[charId];
+    const p = charData.profile;
+    const lightbox = document.getElementById('gallery-lightbox');
+    const imgEl = document.getElementById('gallery-lightbox-img');
+    const favBtn = document.getElementById('lightbox-fav');
+
+    imgEl.src = charData.images.portrait;
+    lightbox.style.display = 'flex';
+    favBtn.style.display = 'none';
+
+    // Show profile overlay
+    let overlay = document.getElementById('profile-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'profile-overlay';
+      lightbox.appendChild(overlay);
+    }
+    overlay.style.display = 'block';
+    overlay.innerHTML = `
+      <div class="profile-name">${charData.name}</div>
+      <div class="profile-name-jp">${charData.nameJp}</div>
+      <div class="profile-stats">
+        <div class="profile-row"><span class="profile-label">Age</span><span>${p.age}</span></div>
+        <div class="profile-row"><span class="profile-label">Height</span><span>${p.height}</span></div>
+        <div class="profile-row"><span class="profile-label">Hobby</span><span>${p.hobby}</span></div>
+        <div class="profile-row"><span class="profile-label">Likes</span><span>${p.likes}</span></div>
+      </div>
+      <div class="profile-quote">"${p.quote}"</div>
+      <div class="profile-personality">${p.personality}</div>
+    `;
+  }
+
   function openLightbox(item) {
     const lightbox = document.getElementById('gallery-lightbox');
     const imgEl = document.getElementById('gallery-lightbox-img');
     const favBtn = document.getElementById('lightbox-fav');
+
+    // Hide profile overlay if it exists
+    const overlay = document.getElementById('profile-overlay');
+    if (overlay) overlay.style.display = 'none';
+    favBtn.style.display = '';
 
     const charData = characters[item.charId];
     imgEl.src = charData.images[item.diffId];
@@ -135,6 +194,9 @@ const Gallery = (() => {
 
   function closeLightbox() {
     document.getElementById('gallery-lightbox').style.display = 'none';
+    const overlay = document.getElementById('profile-overlay');
+    if (overlay) overlay.style.display = 'none';
+    document.getElementById('lightbox-fav').style.display = '';
   }
 
   return { init };

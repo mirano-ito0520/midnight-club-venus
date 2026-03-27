@@ -187,5 +187,82 @@
         { "speaker": "CORAL", "text": "コーラルって…呼んで♡" }
       ]
     }
+  },
+  "neon": {
+    "easy": {
+      "before": [
+        { "speaker": "NEON", "text": "おっ！新入り？…{playerName}ってヤツか" },
+        { "speaker": "NEON", "text": "あたしはネオン。このフロアのサウンドは全部あたしが支配してんの" },
+        { "speaker": "NEON", "text": "ゲーム？いいじゃん、やってみなよ。…ビートに乗れるかな？笑" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "へぇ〜、なかなかやるじゃん{playerName}！" },
+        { "speaker": "NEON", "text": "ちょっとだけ見直したかも。…ちょっとだけね？" }
+      ]
+    },
+    "normal": {
+      "before": [
+        { "speaker": "NEON", "text": "{playerName}じゃん。また来たの？…嫌いじゃないよ、そういうの" },
+        { "speaker": "NEON", "text": "今回はちょっとテンポ上げてくからね。ついてこれる？" },
+        { "speaker": "NEON", "text": "あたしのこと…もうちょい近くで見たい？だったらクリアしてみせなよ💗" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "お〜やるやる！{playerName}、ノリいいじゃん！" },
+        { "speaker": "NEON", "text": "…ちょっとだけ、サービスしてあげよっか。次の曲、特別だよ？" }
+      ]
+    },
+    "hard": {
+      "before": [
+        { "speaker": "NEON", "text": "{playerName}…あんた、マジでしつこいね。…好きだけど、そういうの" },
+        { "speaker": "NEON", "text": "ねぇ、今日のあたし見た？ちょっと気合い入れてきちゃった" },
+        { "speaker": "NEON", "text": "このステージ、ガチで速いからね。…あたしのために全力で走ってよ？" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "…はぁはぁ…やば、あんた本気じゃん…" },
+        { "speaker": "NEON", "text": "…{playerName}にだけ言うけど、あたし今めっちゃアガってる" }
+      ]
+    },
+    "expert": {
+      "before": [
+        { "speaker": "NEON", "text": "{playerName}…あんたさ、あたしのこと攻略してるつもり？" },
+        { "speaker": "NEON", "text": "…まぁいいけど。正直、あたしも…ちょっとハマってきてるし" },
+        { "speaker": "NEON", "text": "今日の衣装ね…あんたのために選んだって言ったら…引く？" },
+        { "speaker": "NEON", "text": "引かないでよ？…走って。あたしの全部、見せてあげるから❤️" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "…{playerName}…あんた、マジでヤバい" },
+        { "speaker": "NEON", "text": "こんな気持ち…あたしの曲でも表現できないかも…" }
+      ]
+    },
+    "master": {
+      "before": [
+        { "speaker": "NEON", "text": "…{playerName}" },
+        { "speaker": "NEON", "text": "あたしさ、ずっとDJブースの向こう側にいたじゃん" },
+        { "speaker": "NEON", "text": "みんなを盛り上げて、みんなに音楽届けて…でも、いつもひとりで" },
+        { "speaker": "NEON", "text": "あんたが来てから…初めて、ブースから降りたいって思った" },
+        { "speaker": "NEON", "text": "最後のステージ…あたしの全部かけて走るから" },
+        { "speaker": "NEON", "text": "…あんたも、全力で来いよ…？" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "…はぁ…はぁ……やば……" },
+        { "speaker": "NEON", "text": "{playerName}……あたし、もう音楽だけじゃ足りない" },
+        { "speaker": "NEON", "text": "あんたがいないと…ビートが刻めないんだよ…" }
+      ]
+    },
+    "vip": {
+      "before": [
+        { "speaker": "NEON", "text": "…{playerName}。今夜は特別" },
+        { "speaker": "NEON", "text": "クラブはもう閉まった。…あたしたちだけのアフターアワーズ" },
+        { "speaker": "NEON", "text": "これ…誰にも見せたことない。あんただけの、プライベートセット" },
+        { "speaker": "NEON", "text": "音楽もあたし自身も…全部、{playerName}だけのもの" },
+        { "speaker": "NEON", "text": "…最後まで、目、逸らさないでね…？" }
+      ],
+      "after": [
+        { "speaker": "NEON", "text": "……{playerName}" },
+        { "speaker": "NEON", "text": "…あたしの音楽、あたしの全部…受け取ってくれた" },
+        { "speaker": "NEON", "text": "…ありがと。…大好き" },
+        { "speaker": "NEON", "text": "…って！今の忘れろ！！…忘れんなよ？…ばか❤️" }
+      ]
+    }
   }
 }

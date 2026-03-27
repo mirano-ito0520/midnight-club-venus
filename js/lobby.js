@@ -20,7 +20,7 @@ const Lobby = (() => {
     const data = Storage.load();
 
     // Check if all puzzles cleared
-    const playableChars = ['marina', 'luna', 'coral'];
+    const playableChars = ['marina', 'luna', 'coral', 'neon'];
     const diffs = ['easy', 'normal', 'hard', 'expert', 'master'];
     let totalCleared = 0;
     const totalPuzzles = playableChars.length * diffs.length;
@@ -32,7 +32,10 @@ const Lobby = (() => {
     });
 
     let speech;
-    if (totalCleared >= totalPuzzles) {
+    if (isMilanoMode()) {
+      // Developer special treatment
+      speech = `あら……ミラノさん。お待ちしておりました。\n当クラブのすべてはあなたのために用意されております——\nどうぞ、ごゆっくりお楽しみくださいませ♡`;
+    } else if (totalCleared >= totalPuzzles) {
       speech = `あら…全部クリアしちゃったの？${playerName}さん、やるわね。\nでも安心して。このクラブには、まだまだ秘密があるから——`;
     } else {
       speech = `おかえりなさい、${playerName}さん。今夜はどのゲームで遊ぶ？`;
@@ -57,8 +60,38 @@ const Lobby = (() => {
     });
     grid.appendChild(jigsawCard);
 
-    // Coming Soon cabinets
-    for (let i = 0; i < 3; i++) {
+    // Midnight Run cabinet
+    const runnerCard = createCabinetCard({
+      icon: 'assets/images/characters/neon/cabinet.png',
+      name: 'Midnight Run',
+      locked: false,
+      onClick: () => {
+        App.SE.play('button-click');
+        App.goTo('runner-diff-select');
+        RunnerDiffSelect.init();
+      },
+    });
+    grid.appendChild(runnerCard);
+
+    // VIP ROOM cabinet (visible when unlocked or ミラノ mode)
+    if (Storage.get('vipUnlocked')) {
+      const vipCard = createCabinetCard({
+        icon: 'assets/images/characters/roulette/venus.png',
+        name: 'VIP ROOM',
+        locked: false,
+        onClick: () => {
+          App.SE.play('door-open');
+          openSecretGallery();
+        },
+      });
+      vipCard.style.borderColor = 'rgba(255, 215, 0, 0.5)';
+      vipCard.querySelector('.cabinet-name').style.color = 'var(--neon-gold)';
+      grid.appendChild(vipCard);
+    }
+
+    // Coming Soon cabinets (fill remaining slots)
+    const comingSoonCount = Storage.get('vipUnlocked') ? 1 : 2;
+    for (let i = 0; i < comingSoonCount; i++) {
       const card = createCabinetCard({
         icon: 'assets/images/ui/cabinet-comingsoon.png',
         name: 'Coming Soon',

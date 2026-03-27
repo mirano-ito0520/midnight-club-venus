@@ -7,6 +7,14 @@
     "images": {
       "portrait": "assets/images/characters/venus/portrait.png",
       "fullbody": "assets/images/characters/venus/fullbody.png"
+    },
+    "profile": {
+      "age": "???",
+      "height": "172cm",
+      "hobby": "カクテル作り、占い、人間観察",
+      "personality": "優雅、包容力、意味深な微笑み",
+      "likes": "月夜、秘密、面白い人間",
+      "quote": "このクラブには、まだまだ秘密があるから——"
     }
   },
   "marina": {
@@ -22,6 +30,14 @@
       "hard": "assets/images/characters/marina/hard.png",
       "expert": "assets/images/characters/marina/expert.png",
       "master": "assets/images/characters/marina/master.png"
+    },
+    "profile": {
+      "age": "19",
+      "height": "163cm",
+      "hobby": "サーフィン、ビーチバレー、貝殻集め",
+      "personality": "フレンドリー、天真爛漫、ちょっとドジ",
+      "likes": "海、太陽、トロピカルジュース",
+      "quote": "あたしと一緒にビーチで遊ぼうよ！"
     }
   },
   "luna": {
@@ -37,6 +53,14 @@
       "hard": "assets/images/characters/luna/hard.png",
       "expert": "assets/images/characters/luna/expert.png",
       "master": "assets/images/characters/luna/master.png"
+    },
+    "profile": {
+      "age": "21",
+      "height": "168cm",
+      "hobby": "夜景巡り、読書、ワイン",
+      "personality": "クール、からかい上手、実は甘えたがり",
+      "likes": "月明かり、静かな夜、ミステリー小説",
+      "quote": "…別に、あなたに会いたかったわけじゃないけど"
     }
   },
   "coral": {
@@ -52,6 +76,42 @@
       "hard": "assets/images/characters/coral/hard.png",
       "expert": "assets/images/characters/coral/expert.png",
       "master": "assets/images/characters/coral/master.png"
+    },
+    "profile": {
+      "age": "22",
+      "height": "158cm",
+      "hobby": "お菓子作り、ガーデニング、アロマテラピー",
+      "personality": "おっとり、甘え上手、小悪魔的",
+      "likes": "花、スイーツ、ピンク色のもの全部",
+      "quote": "お姉さんに甘えてもいいのよ〜♡"
+    }
+  },
+  "neon": {
+    "id": "neon",
+    "name": "NEON",
+    "nameJp": "ネオン",
+    "role": "playable",
+    "game": "runner",
+    "background": "dialogue-club",
+    "images": {
+      "portrait": "assets/images/characters/neon/portrait.png",
+      "cabinet": "assets/images/characters/neon/cabinet.png",
+      "run": "assets/images/characters/neon/run.png",
+      "jump": "assets/images/characters/neon/jump.png",
+      "easy": "assets/images/characters/neon/easy.png",
+      "normal": "assets/images/characters/neon/normal.png",
+      "hard": "assets/images/characters/neon/hard.png",
+      "expert": "assets/images/characters/neon/expert.png",
+      "master": "assets/images/characters/neon/master.png",
+      "vip": "assets/images/characters/neon/vip.png"
+    },
+    "profile": {
+      "age": "20",
+      "height": "165cm",
+      "hobby": "DJing、ダンス、レコード収集",
+      "personality": "エネルギッシュ、自由奔放、情熱的",
+      "likes": "ネオンライト、ベースミュージック、夜明け前の空",
+      "quote": "音楽が止まるまで、走り続けるよ！"
     }
   },
   "difficulties": [
@@ -59,11 +119,13 @@
     { "id": "normal", "name": "Normal", "stars": "★★☆☆☆", "pieces": 16, "cols": 4 },
     { "id": "hard",   "name": "Hard",   "stars": "★★★☆☆", "pieces": 25, "cols": 5 },
     { "id": "expert", "name": "Expert", "stars": "★★★★☆", "pieces": 36, "cols": 6 },
-    { "id": "master", "name": "Master", "stars": "★★★★★", "pieces": 49, "cols": 7 }
+    { "id": "master", "name": "Master", "stars": "★★★★★", "pieces": 49, "cols": 7 },
+    { "id": "vip",    "name": "VIP",    "stars": "★★★★★★", "pieces": 49, "cols": 7 }
   ],
   "backgrounds": {
     "dialogue-beach": "assets/images/backgrounds/dialogue-beach.png",
     "dialogue-nightpool": "assets/images/backgrounds/dialogue-nightpool.png",
-    "dialogue-tropical": "assets/images/backgrounds/dialogue-tropical.png"
+    "dialogue-tropical": "assets/images/backgrounds/dialogue-tropical.png",
+    "dialogue-club": "assets/images/backgrounds/dialogue-club.png"
   }
 }

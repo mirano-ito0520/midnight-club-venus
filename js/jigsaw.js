@@ -71,11 +71,10 @@ const DiffSelect = (() => {
 
     const difficulties = characters.difficulties;
 
-    difficulties.forEach((diff, index) => {
+    difficulties.filter(d => d.id !== 'vip').forEach((diff, index) => {
       const progress = Storage.getProgress(selectedCharId, diff.id);
       const isCleared = progress?.cleared;
 
-      // Unlock logic: first difficulty always open, others need previous cleared
       let isLocked = false;
       if (index > 0) {
         const prevDiff = difficulties[index - 1];
@@ -105,7 +104,6 @@ const DiffSelect = (() => {
       if (!isLocked) {
         card.addEventListener('click', () => {
           App.SE.play('button-click');
-          // Start dialogue before puzzle
           Dialogue.start({
             characterId: selectedCharId,
             difficulty: diff.id,
@@ -138,6 +136,14 @@ const JigsawGame = (() => {
   let rows = 0;
   let pieceW = 0;
   let pieceH = 0;
+  // Grid area (where pieces snap to)
+  let gridX = 0;
+  let gridY = 0;
+  let gridW = 0;
+  let gridH = 0;
+  // Tray area (where pieces start)
+  let trayY = 0;
+  let trayH = 0;
   let img = null;
   let characterId = '';
   let difficultyId = '';
@@ -148,25 +154,24 @@ const JigsawGame = (() => {
   let dragging = null;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
-  let canvasScale = 1;
   let showingHint = false;
 
   function start(charId, diffId, numCols) {
+    cleanup();
+
     characterId = charId;
     difficultyId = diffId;
     cols = numCols;
-    rows = numCols; // Square grid for simplicity matching piece count
+    rows = numCols;
 
     App.goTo('jigsaw', { bgm: 'jigsaw' });
 
     canvas = document.getElementById('jigsaw-canvas');
     ctx = canvas.getContext('2d');
 
-    // Load puzzle image
     img = new Image();
     img.crossOrigin = 'anonymous';
 
-    // Get character data for image path
     fetch('data/characters.json')
       .then(r => r.json())
       .then(chars => {
@@ -175,39 +180,57 @@ const JigsawGame = (() => {
         img.onload = () => setupPuzzle();
       });
 
-    // Hint button
     document.getElementById('jigsaw-hint-btn').onclick = showHint;
+
+    // Exit button — back to difficulty select
+    document.getElementById('jigsaw-back-btn').onclick = () => {
+      App.SE.play('button-click');
+      cleanup();
+      App.goTo('diff-select', { bgm: 'jigsaw' });
+      DiffSelect.init(characterId);
+    };
   }
 
   function setupPuzzle() {
     const area = document.getElementById('jigsaw-area');
-    const maxW = area.clientWidth - 16;
-    const maxH = area.clientHeight - 16;
+    const areaW = area.clientWidth;
+    const areaH = area.clientHeight;
 
-    // Image aspect ratio (9:16)
+    canvas.width = areaW;
+    canvas.height = areaH;
+    canvas.style.width = areaW + 'px';
+    canvas.style.height = areaH + 'px';
+
     const imgAspect = img.width / img.height;
-    let canvasW, canvasH;
+    const margin = 8;
+    const gap = 12;
+    // Tray: at least 22% of area or 110px
+    const minTrayH = Math.max(110, areaH * 0.22);
 
-    if (maxW / maxH < imgAspect) {
-      canvasW = maxW;
-      canvasH = maxW / imgAspect;
+    const maxGridW = areaW - margin * 2;
+    const maxGridH = areaH - margin - gap - minTrayH;
+
+    // Fit grid maintaining image aspect ratio
+    if (maxGridW / maxGridH < imgAspect) {
+      gridW = maxGridW;
+      gridH = maxGridW / imgAspect;
     } else {
-      canvasH = maxH;
-      canvasW = maxH * imgAspect;
+      gridH = maxGridH;
+      gridW = maxGridH * imgAspect;
     }
 
-    canvas.width = canvasW;
-    canvas.height = canvasH;
-    canvas.style.width = canvasW + 'px';
-    canvas.style.height = canvasH + 'px';
-    canvasScale = 1;
+    gridX = (areaW - gridW) / 2;
+    gridY = margin;
 
-    pieceW = canvasW / cols;
-    pieceH = canvasH / rows;
+    trayY = gridY + gridH + gap;
+    trayH = areaH - trayY - margin;
+
+    pieceW = gridW / cols;
+    pieceH = gridH / rows;
     totalPieces = cols * rows;
     placedCount = 0;
 
-    // Create pieces
+    // Create pieces — correct positions are within the grid
     pieces = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
@@ -215,20 +238,18 @@ const JigsawGame = (() => {
           id: r * cols + c,
           col: c,
           row: r,
-          // Current position (will be shuffled)
-          x: c * pieceW,
-          y: r * pieceH,
-          // Correct position
-          correctX: c * pieceW,
-          correctY: r * pieceH,
+          x: 0,
+          y: 0,
+          correctX: gridX + c * pieceW,
+          correctY: gridY + r * pieceH,
           placed: false,
         });
       }
     }
 
-    // Show preview first
-    showPreview(() => {
-      shufflePieces();
+    // Show mosaic preview, then start
+    showMosaicPreview(() => {
+      shufflePiecesToTray();
       draw();
       startTimer();
       bindEvents();
@@ -236,51 +257,106 @@ const JigsawGame = (() => {
     });
   }
 
-  function showPreview(callback) {
-    // Show complete image for 3 seconds
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(10, 10, 20, 0.5)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  /* ---- Mosaic Preview ---- */
+  function showMosaicPreview(callback) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawGridOutline();
+
+    // Draw pixelated mosaic of the image
+    const pixelSize = 12;
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    const smallW = Math.ceil(gridW / pixelSize);
+    const smallH = Math.ceil(gridH / pixelSize);
+    tempCanvas.width = smallW;
+    tempCanvas.height = smallH;
+    tempCtx.drawImage(img, 0, 0, smallW, smallH);
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tempCanvas, 0, 0, smallW, smallH, gridX, gridY, gridW, gridH);
+    ctx.imageSmoothingEnabled = true;
+    ctx.restore();
+
+    // Semi-transparent overlay
+    ctx.fillStyle = 'rgba(10, 10, 20, 0.3)';
+    ctx.fillRect(gridX, gridY, gridW, gridH);
+
+    // Text
     ctx.fillStyle = '#ffd700';
-    ctx.font = 'bold 20px Cinzel, serif';
+    ctx.font = 'bold 18px Cinzel, serif';
     ctx.textAlign = 'center';
-    ctx.fillText('PREVIEW', canvas.width / 2, canvas.height / 2);
-    ctx.font = '14px "Noto Sans JP", sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('PREVIEW', gridX + gridW / 2, gridY + gridH / 2 - 12);
+    ctx.font = '13px "Noto Sans JP", sans-serif';
     ctx.fillStyle = '#f0e6ff';
-    ctx.fillText('3秒後にスタート', canvas.width / 2, canvas.height / 2 + 30);
+    ctx.fillText('3秒後にスタート', gridX + gridW / 2, gridY + gridH / 2 + 16);
+    ctx.textBaseline = 'alphabetic';
 
     setTimeout(callback, 3000);
   }
 
-  function shufflePieces() {
-    // Randomly position pieces within canvas bounds
-    pieces.forEach(p => {
-      p.x = Math.random() * (canvas.width - pieceW);
-      p.y = Math.random() * (canvas.height - pieceH);
-      p.placed = false;
-    });
-  }
+  /* ---- Grid Outline ---- */
+  function drawGridOutline() {
+    // Grid background
+    ctx.fillStyle = 'rgba(180, 74, 255, 0.05)';
+    ctx.fillRect(gridX, gridY, gridW, gridH);
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid guides (subtle)
-    ctx.strokeStyle = 'rgba(180, 74, 255, 0.15)';
+    // Grid cell lines
+    ctx.strokeStyle = 'rgba(180, 74, 255, 0.2)';
     ctx.lineWidth = 0.5;
     for (let r = 0; r <= rows; r++) {
       ctx.beginPath();
-      ctx.moveTo(0, r * pieceH);
-      ctx.lineTo(canvas.width, r * pieceH);
+      ctx.moveTo(gridX, gridY + r * pieceH);
+      ctx.lineTo(gridX + gridW, gridY + r * pieceH);
       ctx.stroke();
     }
     for (let c = 0; c <= cols; c++) {
       ctx.beginPath();
-      ctx.moveTo(c * pieceW, 0);
-      ctx.lineTo(c * pieceW, canvas.height);
+      ctx.moveTo(gridX + c * pieceW, gridY);
+      ctx.lineTo(gridX + c * pieceW, gridY + gridH);
       ctx.stroke();
     }
 
-    // Draw placed pieces first (so dragging piece is on top)
+    // Grid outer border
+    ctx.strokeStyle = 'rgba(180, 74, 255, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(gridX, gridY, gridW, gridH);
+
+    // Tray area indicator
+    ctx.strokeStyle = 'rgba(180, 74, 255, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    const trayPad = 4;
+    ctx.strokeRect(trayPad, trayY, canvas.width - trayPad * 2, trayH);
+    ctx.setLineDash([]);
+
+    // Tray label
+    ctx.fillStyle = 'rgba(180, 74, 255, 0.25)';
+    ctx.font = '11px "Noto Sans JP", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('PIECES', trayPad + 8, trayY + 14);
+  }
+
+  /* ---- Shuffle to Tray ---- */
+  function shufflePiecesToTray() {
+    const pad = 4;
+    const trayW = canvas.width - pad * 2;
+    pieces.forEach(p => {
+      p.x = pad + Math.random() * (trayW - pieceW);
+      p.y = trayY + 4 + Math.random() * Math.max(0, trayH - pieceH - 8);
+      p.placed = false;
+    });
+  }
+
+  /* ---- Draw ---- */
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawGridOutline();
+
+    // Draw placed pieces (in grid), then unplaced, then dragging on top
     pieces.filter(p => p.placed).forEach(p => drawPiece(p));
     pieces.filter(p => !p.placed && p !== dragging).forEach(p => drawPiece(p));
     if (dragging) drawPiece(dragging, true);
@@ -301,25 +377,42 @@ const JigsawGame = (() => {
     ctx.drawImage(img, sx, sy, sw, sh, piece.x, piece.y, pieceW, pieceH);
 
     // Border
-    ctx.strokeStyle = piece.placed ? 'rgba(255, 215, 0, 0.3)' : 'rgba(255, 255, 255, 0.4)';
+    ctx.strokeStyle = piece.placed
+      ? 'rgba(255, 215, 0, 0.4)'
+      : 'rgba(255, 255, 255, 0.5)';
     ctx.lineWidth = highlight ? 2 : 1;
     ctx.strokeRect(piece.x, piece.y, pieceW, pieceH);
     ctx.restore();
   }
 
+  /* ---- Hint (mosaic) ---- */
   function showHint() {
     if (showingHint) return;
     showingHint = true;
+
+    const pixelSize = 10;
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    const smallW = Math.ceil(gridW / pixelSize);
+    const smallH = Math.ceil(gridH / pixelSize);
+    tempCanvas.width = smallW;
+    tempCanvas.height = smallH;
+    tempCtx.drawImage(img, 0, 0, smallW, smallH);
+
     ctx.save();
-    ctx.globalAlpha = 0.4;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 0.5;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tempCanvas, 0, 0, smallW, smallH, gridX, gridY, gridW, gridH);
+    ctx.imageSmoothingEnabled = true;
     ctx.restore();
+
     setTimeout(() => {
       showingHint = false;
       draw();
     }, 2000);
   }
 
+  /* ---- Input Events ---- */
   function bindEvents() {
     canvas.onmousedown = (e) => onPointerDown(e.offsetX, e.offsetY);
     canvas.onmousemove = (e) => onPointerMove(e.offsetX, e.offsetY);
@@ -342,7 +435,6 @@ const JigsawGame = (() => {
   }
 
   function onPointerDown(x, y) {
-    // Find topmost non-placed piece under pointer
     for (let i = pieces.length - 1; i >= 0; i--) {
       const p = pieces[i];
       if (p.placed) continue;
@@ -350,7 +442,6 @@ const JigsawGame = (() => {
         dragging = p;
         dragOffsetX = x - p.x;
         dragOffsetY = y - p.y;
-        // Move to end of array (top z-order)
         pieces.splice(i, 1);
         pieces.push(p);
         draw();
@@ -369,8 +460,7 @@ const JigsawGame = (() => {
   function onPointerUp() {
     if (!dragging) return;
 
-    // Snap check
-    const snapThreshold = pieceW * 0.3;
+    const snapThreshold = pieceW * 0.35;
     const dx = Math.abs(dragging.x - dragging.correctX);
     const dy = Math.abs(dragging.y - dragging.correctY);
 
@@ -391,6 +481,7 @@ const JigsawGame = (() => {
     draw();
   }
 
+  /* ---- HUD & Timer ---- */
   function updateHUD() {
     document.getElementById('jigsaw-pieces').textContent = `${placedCount} / ${totalPieces}`;
   }
@@ -416,10 +507,10 @@ const JigsawGame = (() => {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
+  /* ---- Puzzle Complete ---- */
   function onPuzzleComplete() {
     const elapsed = stopTimer();
 
-    // Unbind events
     canvas.onmousedown = null;
     canvas.onmousemove = null;
     canvas.onmouseup = null;
@@ -429,12 +520,14 @@ const JigsawGame = (() => {
 
     App.SE.play('puzzle-clear');
 
-    // Save progress
     const prev = Storage.getProgress(characterId, difficultyId);
     const bestTime = prev?.bestTime ? Math.min(prev.bestTime, elapsed) : elapsed;
     Storage.setProgress(characterId, difficultyId, { cleared: true, bestTime });
 
-    // After-clear dialogue, then clear screen
+    // Show completed image in grid briefly
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, img.width, img.height, gridX, gridY, gridW, gridH);
+
     setTimeout(() => {
       Dialogue.start({
         characterId,
@@ -442,27 +535,19 @@ const JigsawGame = (() => {
         timing: 'after',
         callback: () => showClearScreen(elapsed),
       });
-    }, 500);
+    }, 800);
   }
 
   function showClearScreen(elapsed) {
+    // Set image BEFORE scene transition so old image never shows
+    document.getElementById('clear-image').style.backgroundImage = `url('${img.src}')`;
+    document.getElementById('clear-time').textContent = `Time: ${formatTime(elapsed)}`;
+
     App.goTo('jigsaw-clear', { bgm: 'clear' });
     App.SE.play('gallery-add');
 
-    // Load char data for image
-    fetch('data/characters.json')
-      .then(r => r.json())
-      .then(chars => {
-        const charData = chars[characterId];
-        const imgUrl = charData.images[difficultyId];
-        document.getElementById('clear-image').style.backgroundImage = `url('${imgUrl}')`;
-      });
-
-    document.getElementById('clear-time').textContent = `Time: ${formatTime(elapsed)}`;
-
     document.getElementById('clear-next-btn').onclick = () => {
       App.SE.play('button-click');
-      // Go back to difficulty select
       App.goTo('diff-select', { bgm: 'jigsaw' });
       DiffSelect.init(characterId);
     };
@@ -474,5 +559,21 @@ const JigsawGame = (() => {
     };
   }
 
-  return { start };
+  /* ---- Cleanup ---- */
+  function cleanup() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    if (canvas) {
+      canvas.onmousedown = null;
+      canvas.onmousemove = null;
+      canvas.onmouseup = null;
+      canvas.onmouseleave = null;
+      canvas.ontouchstart = null;
+      canvas.ontouchmove = null;
+      canvas.ontouchend = null;
+    }
+    dragging = null;
+  }
+
+  return { start, cleanup };
 })();

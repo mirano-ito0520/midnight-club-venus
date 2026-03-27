@@ -9,6 +9,7 @@ const Dialogue = (() => {
   let fullText = '';
   let onComplete = null;
   let characters = null;
+  let dialogueData = null;
   let clickHandler = null;
 
   async function start({ characterId, difficulty, timing, callback }) {
@@ -17,8 +18,11 @@ const Dialogue = (() => {
       characters = await res.json();
     }
 
-    const dlgRes = await fetch('data/dialogues.json');
-    const dialogues = await dlgRes.json();
+    if (!dialogueData) {
+      const dlgRes = await fetch('data/dialogues.json');
+      dialogueData = await dlgRes.json();
+    }
+    const dialogues = dialogueData;
 
     const charDialogues = dialogues[characterId];
     if (!charDialogues || !charDialogues[difficulty] || !charDialogues[difficulty][timing]) {
@@ -27,6 +31,23 @@ const Dialogue = (() => {
     }
 
     lines = charDialogues[difficulty][timing];
+
+    // Developer mode: ミラノ → special VIP lines
+    if (isMilanoMode()) {
+      const charName = characters[characterId]?.nameJp || characterId;
+      if (timing === 'before') {
+        lines = [
+          { speaker: lines[0].speaker, text: `ミラノさん…！いらしてくださったんですね…♡` },
+          { speaker: lines[0].speaker, text: `${charName}、今日はミラノさんのために特別に…全力でお見せしますね♡` },
+        ];
+      } else {
+        lines = [
+          { speaker: lines[0].speaker, text: `ミラノさん…いかがでしたか？♡` },
+          { speaker: lines[0].speaker, text: `また…いつでもいらしてくださいね。${charName}はいつでもお待ちしてます♡` },
+        ];
+      }
+    }
+
     currentIndex = 0;
     onComplete = callback;
 
@@ -42,8 +63,13 @@ const Dialogue = (() => {
 
     document.getElementById('dialogue-speaker').textContent = charData.name;
 
-    // Navigate to dialogue scene
-    App.goTo('dialogue', { bgm: 'dialogue' });
+    // Navigate to dialogue scene (NEON uses special BGM per difficulty)
+    let bgm = 'dialogue';
+    if (characterId === 'neon') {
+      const intimateDiffs = ['expert', 'master', 'vip'];
+      bgm = intimateDiffs.includes(difficulty) ? 'after-hours' : 'electric-heart';
+    }
+    App.goTo('dialogue', { bgm });
 
     // Show first line
     showLine();
@@ -53,6 +79,17 @@ const Dialogue = (() => {
     if (clickHandler) sceneEl.removeEventListener('click', clickHandler);
     clickHandler = handleClick;
     sceneEl.addEventListener('click', clickHandler);
+
+    // Skip button — finish dialogue immediately
+    document.getElementById('dialogue-skip-btn').onclick = (e) => {
+      e.stopPropagation();
+      if (activeTimer) clearInterval(activeTimer);
+      activeTimer = null;
+      isTyping = false;
+      sceneEl.removeEventListener('click', clickHandler);
+      clickHandler = null;
+      if (onComplete) onComplete();
+    };
   }
 
   function showLine() {
@@ -84,21 +121,27 @@ const Dialogue = (() => {
     }
   }
 
+  let activeTimer = null;
+
   function typeText(el, text, speed = 35) {
+    // Clear any previous interval to prevent text corruption
+    if (activeTimer) clearInterval(activeTimer);
     isTyping = true;
     fullText = text;
     el.textContent = '';
     let i = 0;
-    const timer = setInterval(() => {
+    activeTimer = setInterval(() => {
       if (!isTyping) {
-        clearInterval(timer);
+        clearInterval(activeTimer);
+        activeTimer = null;
         return;
       }
       el.textContent += text[i];
       i++;
       if (i >= text.length) {
         isTyping = false;
-        clearInterval(timer);
+        clearInterval(activeTimer);
+        activeTimer = null;
       }
     }, speed);
   }

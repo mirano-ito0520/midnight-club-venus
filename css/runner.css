@@ -1,0 +1,164 @@
+/* ============================================
+   Midnight Run — Runner Game Styles
+   ============================================ */
+
+/* ---- Runner Difficulty Select ---- */
+.runner-diff-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 32px;
+  width: 100%;
+  z-index: 2;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.runner-diff-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.runner-diff-card:active {
+  transform: scale(0.97);
+}
+
+.runner-diff-card.cleared {
+  border-color: var(--neon-pink);
+  background: rgba(255, 105, 180, 0.08);
+}
+
+.runner-diff-card.locked {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.runner-diff-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.runner-diff-name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+.runner-diff-stars {
+  font-size: 11px;
+  color: var(--neon-gold);
+}
+
+.runner-diff-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.runner-diff-target {
+  font-size: 11px;
+  color: var(--neon-pink);
+}
+
+.runner-diff-best {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ---- Runner Game Scene ---- */
+.runner-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(to bottom, rgba(10, 10, 20, 0.7), transparent);
+}
+
+.runner-score-display {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--neon-gold);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.runner-target-display {
+  font-size: 11px;
+  color: var(--neon-pink);
+  letter-spacing: 1px;
+}
+
+.runner-area {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#runner-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- Runner Game Over Overlay ---- */
+.runner-gameover {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 0, 15, 0.85);
+  animation: fade-in 0.5s ease-out;
+}
+
+.runner-gameover h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  color: var(--neon-pink);
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+.runner-gameover-score {
+  font-size: 20px;
+  color: var(--neon-gold);
+  margin-bottom: 4px;
+}
+
+.runner-gameover-best {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.runner-gameover-msg {
+  font-size: 13px;
+  color: var(--neon-pink);
+  margin-bottom: 24px;
+}
+
+.runner-gameover-actions {
+  display: flex;
+  gap: 12px;
+}

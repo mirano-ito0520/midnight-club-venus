@@ -55,6 +55,7 @@
   color: var(--text-primary);
   width: calc(100% - 32px);
   backdrop-filter: blur(4px);
+  white-space: pre-line;
 }
 
 .lobby-venus-speech::before {

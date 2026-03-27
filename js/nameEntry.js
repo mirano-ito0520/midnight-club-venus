@@ -10,6 +10,8 @@ const NameEntry = (() => {
   let fullText = '';
   let phase = 'intro'; // 'intro' | 'input' | 'outro'
 
+  let initialized = false;
+
   async function init() {
     const res = await fetch('data/dialogues.json');
     const data = await res.json();
@@ -29,14 +31,15 @@ const NameEntry = (() => {
     // Show first dialogue
     typeText(textEl, dialogues[0].text);
 
-    // Click to advance
-    dialogueBox.addEventListener('click', handleAdvance);
-
-    // Name submit
-    submitBtn.addEventListener('click', () => submitName(nameInput, textEl));
-    nameInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitName(nameInput, textEl);
-    });
+    // Bind events only once to prevent listener stacking
+    if (!initialized) {
+      initialized = true;
+      dialogueBox.addEventListener('click', handleAdvance);
+      submitBtn.addEventListener('click', () => submitName(nameInput, textEl));
+      nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitName(nameInput, textEl);
+      });
+    }
   }
 
   function handleAdvance() {
@@ -81,6 +84,16 @@ const NameEntry = (() => {
     Storage.set('playerName', name);
     document.getElementById('name-input-container').style.display = 'none';
 
+    // Developer mode: ミラノ
+    if (name === 'ミラノ') {
+      applyMilanoMode();
+      afterDialogues = [
+        { speaker: 'VENUS', text: 'ミラノさん……！お会いできて光栄です。' },
+        { speaker: 'VENUS', text: '当クラブのオーナー様がいらっしゃるなんて…今夜は特別な夜になりそう♡' },
+        { speaker: 'VENUS', text: 'すべてのお部屋、すべてのサービスをご用意しております——どうぞ、お楽しみくださいませ♡' },
+      ];
+    }
+
     phase = 'outro';
     currentIndex = 0;
     const text = afterDialogues[0].text.replace(/\{playerName\}/g, name);
@@ -89,21 +102,27 @@ const NameEntry = (() => {
     App.SE.play('button-click');
   }
 
+  let activeTimer = null;
+
   function typeText(el, text, speed = 40) {
+    // Clear any previous interval to prevent text corruption
+    if (activeTimer) clearInterval(activeTimer);
     isTyping = true;
     fullText = text;
     el.textContent = '';
     let i = 0;
-    const timer = setInterval(() => {
+    activeTimer = setInterval(() => {
       if (!isTyping) {
-        clearInterval(timer);
+        clearInterval(activeTimer);
+        activeTimer = null;
         return;
       }
       el.textContent += text[i];
       i++;
       if (i >= text.length) {
         isTyping = false;
-        clearInterval(timer);
+        clearInterval(activeTimer);
+        activeTimer = null;
       }
     }, speed);
   }
