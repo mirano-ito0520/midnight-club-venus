@@ -40,9 +40,9 @@ const KingService = (() => {
   function show(charId) {
     const lines = serviceLines[charId];
     const kingImg = kingImages[charId];
-    const portraitImg = charId === 'venus'
-      ? 'assets/images/characters/venus/portrait.png'
-      : `assets/images/characters/${charId}/portrait.png`;
+    const dialogueImg = charId === 'venus'
+      ? 'assets/images/characters/queen/venus-queen.png'
+      : `assets/images/characters/vip/${charId}-vip.png`;
 
     // Preload king image so it shows instantly later
     const preload = new Image();
@@ -65,7 +65,7 @@ const KingService = (() => {
 
     // Character portrait
     const img = document.createElement('img');
-    img.src = portraitImg;
+    img.src = dialogueImg;
     img.style.cssText = [
       'max-height:55vh', 'max-width:85%', 'object-fit:contain',
       'filter:drop-shadow(0 0 20px rgba(255,215,0,0.3))',
