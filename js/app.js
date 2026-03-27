@@ -422,9 +422,14 @@ const App = (() => {
       document.getElementById('settings-modal').style.display = 'none';
       openVenusProfile();
     } else if (code === 'MIDNIGHT') {
-      msgEl.textContent = '';
-      document.getElementById('settings-modal').style.display = 'none';
-      SlotMachine.start();
+      if (isEverythingUnlocked()) {
+        msgEl.textContent = '';
+        document.getElementById('settings-modal').style.display = 'none';
+        SlotMachine.start();
+      } else {
+        msgEl.innerHTML = '💋 VENUSより：<br>「ふふ…秘密のパスワードを知ってるのね。<br>でも、まだ早いわ。全部クリアしてからね♡」';
+        msgEl.style.color = 'var(--neon-pink)';
+      }
     } else {
       msgEl.textContent = '…？ 違うみたいよ';
       msgEl.style.color = 'var(--text-muted)';
