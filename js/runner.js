@@ -52,32 +52,6 @@ const RunnerDiffSelect = (() => {
       grid.appendChild(card);
     });
 
-    // VIP card — unlocked after all 5 difficulties cleared
-    const allCleared = ['easy','normal','hard','expert','master'].every(
-      d => Storage.getProgress('neon', d)?.cleared
-    );
-    const vipProgress = Storage.getProgress('neon', 'vip');
-    const vipCard = document.createElement('div');
-    vipCard.className = 'runner-diff-card' + (vipProgress?.cleared ? ' cleared' : '') + (!allCleared ? ' locked' : '');
-    vipCard.style.borderColor = allCleared ? 'var(--neon-gold)' : '';
-    vipCard.innerHTML = `
-      <div class="runner-diff-left">
-        <div class="runner-diff-name" style="color:var(--neon-gold);">★ VIP ★</div>
-        <div class="runner-diff-stars">★★★★★★</div>
-      </div>
-      <div class="runner-diff-right">
-        <div class="runner-diff-target">TARGET: ${TARGETS.vip.toLocaleString()}</div>
-        ${vipProgress?.bestScore ? `<div class="runner-diff-best">BEST: ${vipProgress.bestScore.toLocaleString()}</div>` : ''}
-      </div>
-    `;
-    if (allCleared) {
-      vipCard.addEventListener('click', () => {
-        App.SE.play('button-click');
-        RunnerGame.start('vip', TARGETS.vip);
-      });
-    }
-    grid.appendChild(vipCard);
-
     document.getElementById('runner-diff-back').onclick = () => {
       App.SE.play('button-click');
       App.goTo('lobby', { bgm: 'lobby', noHistory: true });
