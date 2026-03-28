@@ -262,7 +262,7 @@ const RunnerGame = (() => {
   function update() {
     frameCount++;
     speed += config.speedUp;
-    score += Math.floor(speed * 0.5);
+    score += Math.floor(speed * 0.9);
 
     // Background scroll
     bgScrollX = (bgScrollX + speed * 0.5) % (stageImg ? stageImg.width : canvas.width);
